@@ -1,0 +1,55 @@
+<div class="login-container">
+  <div class="login-form">
+    <button class="back-btn">← Назад</button>
+    <h1>Увійти</h1>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      <div class="input-group">
+        <label for="email">Email</label>
+        <input
+          type="email"
+          id="email"
+          formControlName="email"
+          placeholder="Email"
+          [class.invalid]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched"
+        />
+        <div class="error" *ngIf="loginForm.get('email')?.errors?.['required'] && loginForm.get('email')?.touched">
+          Email обовʼязковий
+        </div>
+        <div class="error" *ngIf="loginForm.get('email')?.errors?.['email'] && loginForm.get('email')?.touched">
+          Невалідний email
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label for="password">Пароль</label>
+        <input
+          type="password"
+          id="password"
+          formControlName="password"
+          placeholder="Пароль"
+          [class.invalid]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
+        />
+        <div class="error" *ngIf="loginForm.get('password')?.errors?.['required'] && loginForm.get('password')?.touched">
+          Пароль обовʼязковий
+        </div>
+        <div class="error" *ngIf="loginForm.get('password')?.errors?.['minlength'] && loginForm.get('password')?.touched">
+          Мінімум 6 символів
+        </div>
+      </div>
+
+      <a class="forgot-password" href="#">Забули пароль?</a>
+
+      <p class="alt-text">Або увійти за допомогою:</p>
+      <button class="google-login" type="button">
+        <img src="assets/img/google-icon.png" alt="Google" />
+      </button>
+
+      <button class="submit-btn" type="submit">Увійти</button>
+    </form>
+  </div>
+
+  <div class="login-image">
+    <img src="assets/img/squirrel.jpg" alt="Білка" />
+  </div>
+</div>
