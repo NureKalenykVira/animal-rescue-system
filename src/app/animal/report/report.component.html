@@ -1,0 +1,82 @@
+<div class="report-container">
+  <button class="back-btn">← Назад</button>
+
+  <h1>Повідомити про тварину</h1>
+
+  <form [formGroup]="reportForm" (ngSubmit)="onSubmit()">
+    <h2>1 Введи дані про тварину</h2>
+
+    <div class="input-group">
+      <label for="name">Назва</label>
+      <input id="name" type="text" formControlName="name" placeholder="Назва" [class.invalid]="reportForm.get('name')?.invalid && reportForm.get('name')?.touched"/>
+      <div class="error" *ngIf="reportForm.get('name')?.touched && reportForm.get('name')?.invalid"> Вкажіть назву </div>
+    </div>
+
+    <div class="input-group">
+      <label for="type">Вид</label>
+      <input id="type" type="text" formControlName="type" placeholder="Вид" [class.invalid]="reportForm.get('name')?.invalid && reportForm.get('name')?.touched"/>
+      <div class="error" *ngIf="reportForm.get('type')?.touched && reportForm.get('type')?.invalid"> Вкажіть вид тварини </div>
+    </div>
+
+    <div class="input-group">
+      <label>Стать</label>
+      <div class="radio-group">
+        <label><input type="radio" value="дівчина" formControlName="gender" /> Дівчина</label>
+        <label><input type="radio" value="хлопець" formControlName="gender" /> Хлопець</label>
+        <label><input type="radio" value="невідомо" formControlName="gender" /> Невідомо</label>
+      </div>
+      <div class="error" *ngIf="reportForm.get('gender')?.touched && reportForm.get('gender')?.invalid"> Виберіть стать </div>
+    </div>
+
+    <div class="input-group">
+      <label for="notes">Опис</label>
+      <textarea id="notes" formControlName="notes" rows="3" placeholder="Опис"></textarea>
+    </div>
+
+    <h2>2 Додай фото</h2>
+    <div class="input-group photo-upload">
+      <label for="photo" class="photo-btn">
+        {{ selectedFileName ? 'Змінити фото' : 'Вибрати фото' }}
+      </label>
+      <input type="file" id="photo" (change)="onPhotoSelected($event)" hidden />
+      <div class="file-name" *ngIf="selectedFileName">{{ selectedFileName }}</div>
+    </div>
+
+    <div class="photo-preview" *ngIf="photoURL">
+      <img [src]="photoURL" alt="Превʼю" />
+    </div>
+
+    <h2>3 Додай геолокацію</h2>
+    <div #map class="map-container"></div>
+    <div class="error" *ngIf="reportForm.get('location')?.touched && reportForm.get('location')?.invalid">
+      Оберіть місце на карті
+    </div>
+    <div class="selected-address" *ngIf="selectedAddress">
+      Обрано адресу: {{ selectedAddress }}
+    </div>
+
+    <div *ngIf="!isAuthenticated">
+    <h2>4 Вкажи дані про себе</h2>
+    <div class="input-group">
+      <label for="email">Email</label>
+      <input id="email" type="email" formControlName="email" placeholder="Email" [class.invalid]="reportForm.get('name')?.invalid && reportForm.get('name')?.touched"/>
+      <div class="error" *ngIf="reportForm.get('email')?.touched && reportForm.get('email')?.invalid">
+        <span *ngIf="reportForm.get('email')?.errors?.['required']">Email обовʼязковий</span>
+        <span *ngIf="reportForm.get('email')?.errors?.['email']">Невалідний email</span>
+      </div>
+    </div>
+
+    <div class="auth-reminder">
+      <span class="reminder-text">
+        Зауваження: для того, щоб відстежувати подальший стан тварини необхідно зареєструватися!
+      </span>
+      <div class="auth-buttons">
+        <button class="register-btn" (click)="goToRegister()">Зареєструватися</button>
+        <button class="login-btn" (click)="goToLogin()">Увійти</button>
+      </div>
+    </div>
+    </div>
+
+    <button class="submit-btn" type="submit">Надіслати</button>
+  </form>
+</div>

@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { NgIf } from '@angular/common';
+import { Router } from '@angular/router';
+
 @Component({
   selector: 'app-register',
   templateUrl: './register.component.html',
@@ -10,7 +12,7 @@ import { NgIf } from '@angular/common';
 export class RegisterComponent {
   registerForm: FormGroup;
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, private router: Router) {
     this.registerForm = this.fb.group({
       fullName: ['', Validators.required],
       username: ['', Validators.required],
@@ -24,6 +26,7 @@ export class RegisterComponent {
       console.log('Register:', this.registerForm.value);
     } else {
       this.registerForm.markAllAsTouched();
+      this.router.navigate(['/auth/login'], { queryParams: { returnTo: '/animal/report' } });
     }
   }
 }

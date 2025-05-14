@@ -1,0 +1,224 @@
+.report-container {
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 48px;
+  font-family: 'Inter', sans-serif;
+
+  h1 {
+    font-size: 36px;
+    margin-bottom: 32px;
+  }
+
+  h2 {
+    font-size: 20px;
+    margin-top: 32px;
+    margin-bottom: 16px;
+    font-weight: 600;
+  }
+
+  .back-btn {
+    margin-bottom: 24px;
+    font-size: 18px;
+    background: none;
+    border: none;
+    color: #12372a;
+    cursor: pointer;
+  }
+
+  .input-group {
+    display: flex;
+    max-width: 50%;
+    flex-direction: column;
+    margin-bottom: 16px;
+
+    label {
+      font-size: 16px;
+      margin-bottom: 4px;
+    }
+
+    input, textarea {
+      height: 36px;
+      padding: 8px 12px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 15px;
+    }
+
+    textarea {
+      height: auto;
+      resize: vertical;
+    }
+  }
+
+  .radio-group {
+      display: flex;
+      gap: 16px;
+      margin-top: 8px;
+
+    label {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 16px;
+    }
+  }
+
+  input.invalid {
+      border-color: #d32f2f;
+      outline: none;
+      box-shadow: 0 0 0 1px rgba(211, 47, 47, 0.5);
+  }
+
+  .error {
+      color: #d32f2f;
+      font-size: 13px;
+      margin-top: 4px;
+      margin-bottom: 8px;
+      font-family: 'Inter', sans-serif;
+    }
+
+  .photo-upload {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    .photo-btn {
+      background-color: #eeeeee;
+      border: 1px dashed #999;
+      padding: 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: inline-block;
+      text-align: center;
+      font-size: 14px;
+      color: #333;
+    }
+
+    .file-name {
+      font-size: 14px;
+      color: #555;
+    }
+  }
+
+  .photo-preview {
+    width: 50%;
+    max-width: 50%;
+    height: auto;
+    overflow: hidden;
+    border-radius: 8px;
+    margin-top: 12px;
+
+    img {
+      width: 100%;
+      max-height: 300px;
+      object-fit: contain;
+      object-position: center;
+      display: block;
+      border-radius: 8px;
+    }
+  }
+
+  .map-container {
+    width: 100%;
+    height: 400px;
+    margin-top: 16px;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .selected-address {
+    margin-top: 8px;
+    font-size: 14px;
+    color: #444;
+  }
+
+  .alt-text {
+    margin-top: 16px;
+    font-size: 14px;
+    color: #555;
+  }
+
+  .auth-reminder {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    font-family: 'Inter', sans-serif;
+
+    .reminder-text {
+      font-size: 14px;
+      font-weight: 500;
+      color: #555;
+    }
+
+    .auth-buttons {
+      display: flex;
+      gap: 20px;
+      height: 40px;
+
+      .register-btn {
+        background-color: #12372A;
+        color: #fff;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 6px;
+        font-size: 14px;
+        cursor: pointer;
+      }
+
+      .login-btn {
+        background-color: #595959;
+        color: #fff;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 6px;
+        font-size: 14px;
+        cursor: pointer;
+      }
+    }
+  }
+
+  .submit-btn {
+    width: 50%;
+    height: 48px;
+    background-color: #12372a;
+    color: #fff;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 30px;
+  }
+}
+
+@media (max-width: 1000px) {
+  .input-group,
+  .input-group input,
+  .input-group textarea,
+  .gender-options,
+  .submit-btn {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box;
+  }
+
+  .submit-btn {
+    display: block;
+    margin: 100px auto 0;
+  }
+
+  .auth-buttons {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .auth-buttons button {
+    width: 100% !important;
+    margin-top: -10px;
+  }
+
+  .report-form {
+    padding: 0 16px;
+  }
+}
