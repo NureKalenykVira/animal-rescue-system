@@ -1,0 +1,23 @@
+<div class="thank-you-container">
+  <div *ngIf="method === 'self'; else volunteerBlock">
+    <div class="thank-you-container-start">
+    <h1>Дякуємо за Ваш час!</h1>
+    <p>
+      Після передання тваринки до найближчого центру, будь ласка, підтвердьте успішне передання тварини персоналу:
+    </p>
+    <button class="action-button">Передано</button>
+    </div>
+    <h2 class="section-title">Вет-клініки поруч:</h2>
+    <div #map class="map-container"></div>
+  </div>
+
+  <ng-template #volunteerBlock>
+  <div class="block2">
+    <h1>Дякуємо за співпрацю!</h1>
+    <p>
+      Щоб Ви мали змогу слідкувати за долею тваринки далі, вона буде додана до Вашого профілю
+    </p>
+    <button class="action-button" routerLink="/">На головну сторінку</button>
+  </div>
+</ng-template>
+</div>

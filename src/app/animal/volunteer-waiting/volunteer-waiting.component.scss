@@ -1,0 +1,64 @@
+.volunteer-wait-container {
+  background-color: #0d3b2e;
+  color: white;
+  min-height: 100vh;
+  padding: 4rem 1rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+
+  h1 {
+    font-size: 64px;
+    font-weight: bold;
+    line-height: 1.4;
+    font-family: 'Inter', sans-serif;
+    margin-bottom: 16px;
+
+    .dots::after {
+      content: '';
+      display: inline-block;
+      width: 1ch;
+      animation: dots 2s steps(2, end) infinite;
+    }
+  }
+
+  p {
+    margin: 1rem 0;
+    font-size: 1.3rem;
+  }
+
+  .contacts {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 2rem;
+
+    li {
+      margin: 0.5rem 0;
+    }
+  }
+
+  .action-button {
+    background-color: white;
+    color: #0d3b2e;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-size: 1.5rem;
+    font-weight: 500;
+    margin-top: 10px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+
+    &:hover {
+      background-color: #e2e8f0;
+    }
+  }
+}
+
+@keyframes dots {
+  0% { content: ''; }
+  33% { content: '.'; }
+  66% { content: '..'; }
+  100% { content: '...'; }
+}
