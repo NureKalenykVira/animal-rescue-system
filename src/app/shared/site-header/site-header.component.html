@@ -1,0 +1,25 @@
+<header class="site-header">
+  <nav>
+    <a routerLink="/" class="logo">Animal Rescue</a>
+
+    <button class="burger" (click)="toggleMenu()">&#9776;</button>
+
+    <ul [class.open]="menuOpen">
+      <li><a routerLink="/">Про нас</a></li>
+      <li><a routerLink="/animal/volunteer-search">Переглянути тварин</a></li>
+      <li><a routerLink="/donate">Зробити донат</a></li>
+
+      <ng-container *ngIf="isAuthenticated; else guestLinks">
+        <li><a routerLink="/animal/user-profile">Мій профіль</a></li>
+        <li><a routerLink="/auth/login">Вийти</a></li>
+      </ng-container>
+
+      <ng-template #guestLinks>
+        <li><a routerLink="/auth/login">Увійти</a></li>
+        <li><a routerLink="/auth/register">Зареєструватися</a></li>
+      </ng-template>
+
+      <li class="menu-button"><button class="green" routerLink="/animal/report">Повідомити про тварину</button></li>
+    </ul>
+  </nav>
+</header>

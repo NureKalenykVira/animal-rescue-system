@@ -1,0 +1,24 @@
+<footer class="site-footer">
+  <div class="footer-content">
+    <div class="footer-brand">
+      <p class="site-name">Animal Rescue</p>
+      <div class="social-icons">
+        <a href="#"><i class="fa-brands fa-facebook-f"></i></a>
+        <a href="#"><i class="fa-brands fa-linkedin-in"></i></a>
+        <a href="#"><i class="fa-brands fa-youtube"></i></a>
+        <a href="#"><i class="fa-brands fa-instagram"></i></a>
+      </div>
+    </div>
+
+    <div class="footer-columns">
+      <div class="footer-col" *ngFor="let topic of topics">
+        <p class="footer-topic">{{ topic.title }}</p>
+        <ul>
+          <li *ngFor="let page of topic.pages">
+            <a href="#">{{ page }}</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</footer>

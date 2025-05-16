@@ -1,0 +1,93 @@
+.site-header {
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+
+  nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 2rem;
+
+    .logo {
+      font-weight: bold;
+      font-size: 1.2rem;
+    }
+
+    .green {
+        background-color: #006c59;
+        color: #fff;
+        font-weight: 500;
+        height: 40px;
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+
+        &:hover {
+          background-color: #005046;
+        }
+    }
+
+    .burger {
+      display: none;
+      font-size: 1.5rem;
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+
+    ul {
+      display: flex;
+      align-items: center;
+      list-style: none;
+      gap: 1.5rem;
+
+      li {
+        a {
+          text-decoration: none;
+          font-weight: 500;
+          color: #111;
+          background: none;
+          border: none;
+          cursor: pointer;
+        }
+      }
+    }
+
+    // Адаптивність
+    @media (max-width: 1200px) {
+      .burger {
+        display: block;
+      }
+
+      ul {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        left: 0;
+        background: #fff;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+        padding: 1rem 2rem;
+        display: none;
+
+        &.open {
+          display: flex;
+        }
+
+        .menu-button {
+          width: 100%;
+          button.green {
+            width: 100%;
+            text-align: center;
+          }
+        }
+      }
+    }
+  }
+}
