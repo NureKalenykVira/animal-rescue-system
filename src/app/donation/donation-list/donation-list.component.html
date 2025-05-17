@@ -1,0 +1,17 @@
+<app-site-header></app-site-header>
+
+<section class="hero-section donation-hero">
+  <div class="hero-content">
+    <h1>Підтримай тих, хто цього потребує</h1>
+  </div>
+</section>
+
+<main class="donation-list-container">
+  <div *ngFor="let donation of donations" class="donation-card">
+    <h2>{{ donation.title }}</h2>
+    <p>{{ donation.description }}</p>
+    <button (click)="goToPayment(donation.id)" class="donate-btn">Задонатити</button>
+  </div>
+</main>
+
+<app-site-footer></app-site-footer>

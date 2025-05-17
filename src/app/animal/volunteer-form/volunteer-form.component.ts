@@ -11,7 +11,7 @@ declare const google: any;
   templateUrl: './volunteer-form.component.html',
   styleUrls: ['./volunteer-form.component.scss'],
   standalone: true,
-  imports: [ReactiveFormsModule, NgIf, RouterModule]
+  imports: [ReactiveFormsModule, NgIf, RouterModule, ]
 })
 export class VolunteerFormComponent {
   volunteerForm: FormGroup;

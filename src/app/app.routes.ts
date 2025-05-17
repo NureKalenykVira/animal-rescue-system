@@ -10,6 +10,8 @@ import { AnimalListComponent } from './animal/animal-list/animal-list.component'
 import { AnimalProfileComponent } from './animal/animal-profile/animal-profile.component';
 import { AnimalNotificationComponent } from './animal/animal-notification/animal-notification.component';
 import { VolunteerFormComponent } from './animal/volunteer-form/volunteer-form.component';
+import { DonationListComponent } from './donation/donation-list/donation-list.component';
+import { DonationPaymentComponent } from './donation/donation-payment/donation-payment.component'
 
 export const routes: Routes = [
   { path: 'auth/login', component: LoginComponent },
@@ -23,6 +25,8 @@ export const routes: Routes = [
   { path: 'animal/animal-list', component: AnimalListComponent },
   { path: 'animal/volunteer-form', component: VolunteerFormComponent },
   { path: 'animal/animal-notification', component: AnimalNotificationComponent },
+  { path: 'donation/donation-list', component: DonationListComponent },
+  { path: 'donation/donation-payment/:id', component: DonationPaymentComponent },
   { path: 'animal/:id', component: AnimalProfileComponent },
   { path: '**', redirectTo: 'auth/login' }
 ];
