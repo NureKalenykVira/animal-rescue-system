@@ -1,0 +1,34 @@
+<div class="report-container">
+  <button class="back-btn" (click)="goBack()">← Назад</button>
+
+  <h1>Знайдено наступну тварину:</h1>
+
+  <div class="info-photo-row">
+    <div class="animal-info">
+      <div class="report-field"><strong>Назва:</strong> {{ reportData.name }}</div>
+      <div class="report-field"><strong>Вид:</strong> {{ reportData.type }}</div>
+      <div class="report-field"><strong>Стать:</strong> {{ reportData.gender }}</div>
+      <div class="submitted-by report-field" *ngIf="reportData.email">
+        <strong>Надіслано користувачем:</strong> {{ reportData.email }}
+      </div>
+      <div class="report-field" *ngIf="reportData.notes"><strong>Опис:</strong> {{ reportData.notes }}</div>
+    </div>
+
+    <div class="photo-preview" *ngIf="reportData.photoUrl">
+      <img [src]="reportData.photoUrl" alt="Фото тварини" />
+    </div>
+  </div>
+
+  <h2>Тварину знайдено за адресою:</h2>
+  <div class="map-container" *ngIf="reportData.coords">
+    <div #map class="map"></div>
+  </div>
+  <div class="full-address report-field">
+      <strong>Повна адреса:</strong> {{ reportData.address }}
+  </div>
+
+  <div class="action-buttons">
+    <button class="reject-btn" (click)="reject()">Відхилити</button>
+    <button class="accept-btn" (click)="accept()">Прийняти</button>
+  </div>
+</div>

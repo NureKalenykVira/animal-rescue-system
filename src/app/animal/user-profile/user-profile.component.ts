@@ -152,7 +152,7 @@ submitPasswordChange(): void {
 
 openAnimalForm(msg: any) {
   if (msg.type === 'new') {
-    // TODO: відкриття форми (пізніше)
+    this.router.navigate(['animal/animal-notification', msg.animalId]);
     console.log('Відкрити форму для нової тварини');
   } else if (msg.type === 'update') {
     this.router.navigate(['/animals', msg.animalId]);

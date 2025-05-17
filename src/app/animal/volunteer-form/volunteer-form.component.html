@@ -1,0 +1,119 @@
+<div class="volunteer-container">
+  <div class="volunteer-form">
+    <button class="back-btn" [routerLink]="['/animal/user-profile']">← Назад</button>
+    <h1>Для отримання статусу волонтера
+вкажіть наступні дані:</h1>
+
+    <form [formGroup]="volunteerForm" (ngSubmit)="onSubmit()">
+      <div class="input-group">
+        <label for="fullName">ПІБ</label>
+        <input
+          type="text"
+          id="fullName"
+          formControlName="fullName"
+          placeholder="Ваше повне ім’я"
+          [class.invalid]="volunteerForm.get('fullName')?.invalid && volunteerForm.get('fullName')?.touched"
+        />
+        <div class="error" *ngIf="volunteerForm.get('fullName')?.errors?.['required'] && volunteerForm.get('fullName')?.touched">
+          Обовʼязкове поле
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label for="phone">Телефон </label>
+        <input
+          type="tel"
+          id="phone"
+          formControlName="phone"
+          placeholder="+380ХХХХХХХ"
+          [class.invalid]="volunteerForm.get('phone')?.invalid && volunteerForm.get('phone')?.touched"
+        />
+        <div class="error" *ngIf="volunteerForm.get('phone')?.invalid && volunteerForm.get('phone')?.touched">
+          Введіть коректний номер
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label for="location">Місце (місто / населений пункт)</label>
+        <input id="autocomplete" type="text" placeholder="Місто / населений пункт" />
+        <div class="error" *ngIf="volunteerForm.get('location')?.invalid && volunteerForm.get('location')?.touched">
+          Вкажіть ваше місце проживання
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label>Наявність транспорту</label>
+        <select formControlName="hasTransport" [class.invalid]="volunteerForm.get('hasTransport')?.invalid && volunteerForm.get('hasTransport')?.touched">
+          <option value="" disabled selected>Оберіть варіант</option>
+          <option value="yes">Так</option>
+          <option value="no">Ні</option>
+        </select>
+        <div class="error" *ngIf="volunteerForm.get('hasTransport')?.invalid && volunteerForm.get('hasTransport')?.touched">
+          Оберіть варіант
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label>Як Ви можете допомагати?</label>
+        <div class="checkbox-group">
+          <label><input type="checkbox" value="Тимчасове прихистування тварин" (change)="onHelpTypeChange($event)" /> Тимчасове прихистування тварин</label>
+          <label><input type="checkbox" value="Доставка до клініки" (change)="onHelpTypeChange($event)" /> Доставка до клініки</label>
+          <label><input type="checkbox" value="Виїзд на місце знаходження тварини" (change)="onHelpTypeChange($event)" /> Виїзд на місце</label>
+          <label><input type="checkbox" value="Медичний догляд / після лікування" (change)="onHelpTypeChange($event)" /> Медичний/післялікувальний догляд</label>
+          <label><input type="checkbox" value="Інформаційна підтримка / соцмережі" (change)="onHelpTypeChange($event)" /> Інформаційна підтримка</label>
+        </div>
+        <div class="error" *ngIf="volunteerForm.get('helpTypes')?.invalid && volunteerForm.get('helpTypes')?.touched">
+          Оберіть хоча б один варіант
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label for="availability">Доступність за часом</label>
+        <select formControlName="availability">
+          <option disabled selected value="">Оберіть час</option>
+          <option value="У будні">У будні</option>
+          <option value="У вихідні">У вихідні</option>
+          <option value="У будь-який час">У будь-який час</option>
+        </select>
+        <div class="error" *ngIf="volunteerForm.get('availability')?.invalid && volunteerForm.get('availability')?.touched">
+          Вкажіть доступність
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label for="experience">Досвід з тваринами (необовʼязково)</label>
+        <textarea
+          id="experience"
+          formControlName="experience"
+          placeholder="Опишіть свій досвід (якщо маєте)"
+        ></textarea>
+      </div>
+
+      <div class="input-group checkbox-group">
+        <label>
+          <input type="checkbox" formControlName="consent" />
+          Я погоджуюсь на обробку моїх даних
+        </label>
+        <div class="error" *ngIf="volunteerForm.get('consent')?.invalid && volunteerForm.get('consent')?.touched">
+          Потрібна ваша згода
+        </div>
+      </div>
+
+      <button class="submit-btn" type="submit">Надіслати анкету</button>
+    </form>
+  </div>
+
+  <div class="volunteer-image">
+    <img src="assets/img/owl.jpg" alt="Сова" />
+  </div>
+</div>
+
+<div class="modal-overlay" *ngIf="showDialog">
+  <div class="modal-content">
+    <h2>Анкету надіслано!</h2>
+    <p>Ваші дані успішно надіслані на розгляд. Ми повідомимо Вас про результат найближчим часом.</p>
+    <div class="modal-buttons">
+      <button (click)="redirectToProfile()">Повернутись до профілю</button>
+    </div>
+  </div>
+</div>

@@ -34,7 +34,7 @@
         <input type="text" [value]="role" disabled />
       </label>
 
-      <a class="doyouwannabe" href="#">Стати волонтером?</a>
+      <a class="doyouwannabe" [routerLink]="['/animal/volunteer-form']">Стати волонтером?</a>
 
       <label>
         Пароль
@@ -79,7 +79,7 @@
   <h2>Повідомлення:</h2>
 
   <div *ngFor="let msg of messages" class="notification-card">
-    <div class="msg-body" (click)="openAnimalForm(msg)">
+    <div class="msg-body" (click)="openAnimalForm(msg)" [routerLink]="['/animal/animal-notification']">
       <div class="msg-title">{{ msg.title }}</div>
       <div class="msg-date">{{ msg.date }}</div>
     </div>

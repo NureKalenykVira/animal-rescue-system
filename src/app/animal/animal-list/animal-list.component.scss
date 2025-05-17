@@ -1,0 +1,182 @@
+.animal-list-container {
+  padding: 0; // 📌 прибираємо відступи згори
+
+  .hero-section {
+    width: 100vw;
+    margin: 0;
+    background-size: cover;
+    text-align: center;
+    color: white;
+
+    &.forest-bg {
+      background-image: url('/assets/img/fox.jpg');
+      background-position: center;
+    }
+
+    &.bear-bg {
+      background-image: url('/assets/img/bear.jpg');
+      background-position: center 35%;
+    }
+
+    .hero-content {
+      backdrop-filter: brightness(0.5);
+      padding: 4rem 1rem;
+
+      h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 2rem;
+      }
+
+      .hero-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 1.5rem;
+
+        .green-btn {
+          background-color: #006c59;
+          color: white;
+          padding: 0.75rem 1.5rem;
+          font-size: 1rem;
+          border: none;
+          border-radius: 8px;
+          text-decoration: none;
+          font-weight: 500;
+          transition: background-color 0.3s;
+
+          &:hover {
+            background-color: #005046;
+          }
+        }
+      }
+    }
+  }
+
+  .animal-grid {
+    padding: 2rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+
+    .animal-card {
+      background: #f9f9f9;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+      transition: transform 0.2s ease;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+
+      &:hover {
+        transform: translateY(-3px);
+      }
+
+      a {
+        text-decoration: none;
+        color: inherit;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .follow-marker-img {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        width: 36px;
+        height: 36px;
+        opacity: 0.9;
+        z-index: 2;
+      }
+
+      img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+      }
+
+      .animal-info {
+        padding: 1rem;
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+
+        h3 {
+          margin: 0 0 0.5rem;
+          font-size: 1.2rem;
+          font-weight: 600;
+        }
+
+        p {
+          font-size: 0.95rem;
+          margin-bottom: auto;
+          color: #444;
+        }
+
+        .green-btn {
+          margin-top: 1rem;
+          background-color: #006c59;
+          color: white;
+          padding: 0.5rem 1rem;
+          font-size: 0.95rem;
+          border: none;
+          border-radius: 6px;
+          cursor: pointer;
+          align-self: flex-start;
+
+          &.not-authenticated {
+            background-color: #6b7280;
+            cursor: not-allowed;
+            border: 1px solid #a80000;
+            color: white;
+
+            &:hover {
+              background-color: #6b7280;
+            }
+          }
+
+          &.is-following {
+            background-color: #006c59;
+
+            &:hover {
+              background-color: #005046;
+            }
+
+            cursor: pointer;
+          }
+        }
+      }
+    }
+  }
+}
+
+.load-more-wrapper {
+  text-align: center;
+  margin: 2rem 0;
+  margin-left: 230%;
+
+  .green-btn {
+    width: 200px;
+    display: inline-block;
+    margin: 0 auto;
+    background-color: #006c59;
+    color: white;
+    padding: 0.75rem 2rem;
+    font-size: 1rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+
+    &:hover {
+      background-color: #005046;
+    }
+  }
+}
+
+.empty-message {
+  text-align: center;
+  font-size: 2rem;
+  color: #444;
+  margin-top: 2rem;
+}
