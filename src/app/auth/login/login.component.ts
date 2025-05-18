@@ -35,4 +35,8 @@ export class LoginComponent {
   goToRegister() {
     this.router.navigate(['/auth/register']);
   }
+
+  goBack(): void {
+    this.router.navigate(['/home']);
+  }
 }

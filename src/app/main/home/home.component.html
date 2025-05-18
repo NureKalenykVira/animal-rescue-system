@@ -1,0 +1,75 @@
+<app-site-header></app-site-header>
+
+<main class="home-container">
+
+  <!-- Блок "Повідомити про тварину" -->
+  <section class="report-section">
+    <div class="report-banner">
+      <img src="assets/img/bunny.jpg" alt="Тварина" />
+    </div>
+    <div class="report-text">
+      <h1>Побачили тварину, яка потребує допомоги?</h1>
+      <p>Твоя небайдужість рятує життя. Ми подбаємо про решту.</p>
+      <a routerLink="/animal/report" class="green-btn">Повідомити про тварину</a>
+    </div>
+  </section>
+
+  <!-- Блок "Тварини, яким допомогли" -->
+  <section class="adopted-section">
+    <h2>Тварини, яким вже допомогли</h2>
+    <div class="animal-row">
+      <div class="animal-card" *ngFor="let animal of adoptedAnimals">
+        <a [routerLink]="['/animal', animal.id]">
+          <img [src]="animal.photoUrl" alt="Тварина" />
+          <h3>{{ animal.name }}</h3>
+          <p class="status-label">Статус: {{ animal.status }}</p>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Блок "Як ми працюємо" -->
+  <section class="how-section">
+  <div class="how-content">
+    <div class="text-block">
+      <h2>Як ми працюємо</h2>
+      <ul class="work-steps">
+        <li>
+          <strong>Знайшли тварину — повідомте про це</strong><br />
+          Натисніть кнопку «Повідомити про тварину», заповніть просту форму: короткий опис, фото (за наявності), ваше місцезнаходження (визначається автоматично або вводиться вручну).
+        </li>
+        <li>
+          <strong>Очікуйте на підтвердження та волонтера</strong><br />
+          Після надсилання заявки ми автоматично шукаємо найближчого доступного волонтера. Ви побачите повідомлення про очікування — не закривайте сторінку.
+        </li>
+        <li>
+          <strong>Передайте тварину волонтеру</strong><br />
+          Коли волонтер знайде вас, він ідентифікує себе та допоможе з перевезенням тварини до ветклініки або пункту тимчасового утримання.
+        </li>
+        <li>
+          <strong>Слідкуйте за її історією</strong><br />
+          Після підтвердження передачі ви зможете бачити тварину у своєму профілі: її стан, фото, лікування та результат (усиновлення або повернення в дику природу).
+        </li>
+        <li>
+          <strong>Підтримайте інших</strong><br />
+          Ви можете стежити за іншими тваринами, волонтерити або задонатити на лікування. Разом ми допомагаємо більше! Якщо залишились питання — натисніть нижче
+        </li>
+      </ul>
+      <div class="button-wrapper">
+        <a routerLink="/about" class="green-btn">Дізнатися більше</a>
+      </div>
+    </div>
+      <img src="assets/img/beaver.jpg" alt="Як ми працюємо" class="how-img" />
+    </div>
+  </section>
+
+
+  <!-- Блок з картою -->
+  <section class="map-section">
+    <h2>Знайди вет-клініку поруч</h2>
+    <div #map class="map-container"></div>
+  </section>
+
+</main>
+
+<app-site-footer></app-site-footer>

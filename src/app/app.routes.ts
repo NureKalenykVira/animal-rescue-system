@@ -11,12 +11,14 @@ import { AnimalProfileComponent } from './animal/animal-profile/animal-profile.c
 import { AnimalNotificationComponent } from './animal/animal-notification/animal-notification.component';
 import { VolunteerFormComponent } from './animal/volunteer-form/volunteer-form.component';
 import { DonationListComponent } from './donation/donation-list/donation-list.component';
-import { DonationPaymentComponent } from './donation/donation-payment/donation-payment.component'
+import { DonationPaymentComponent } from './donation/donation-payment/donation-payment.component';
+import { HomeComponent } from './main/home/home.component';
+import { AboutComponent } from './main/about/about.component';
+
 
 export const routes: Routes = [
   { path: 'auth/login', component: LoginComponent },
   { path: 'auth/register', component: RegisterComponent },
-  { path: '', redirectTo: 'auth/login', pathMatch: 'full' },
   { path: 'animal/report', component: ReportComponent },
   { path: 'animal/volunteer-search', component: VolunteerSearchComponent },
   { path: 'animal/volunteer-waiting', component: VolunteerWaitingComponent },
@@ -27,6 +29,9 @@ export const routes: Routes = [
   { path: 'animal/animal-notification', component: AnimalNotificationComponent },
   { path: 'donation/donation-list', component: DonationListComponent },
   { path: 'donation/donation-payment/:id', component: DonationPaymentComponent },
+  { path: 'about', component: AboutComponent },
+  { path: 'home', component: HomeComponent },
   { path: 'animal/:id', component: AnimalProfileComponent },
-  { path: '**', redirectTo: 'auth/login' }
+  { path: '', redirectTo: 'home', pathMatch: 'full' },
+  { path: '**', redirectTo: 'home' }
 ];

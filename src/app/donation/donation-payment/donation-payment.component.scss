@@ -152,13 +152,20 @@
     align-items: center;
     gap: 0.5rem;
     font-size: 0.95rem;
-    margin: 1rem 0;
+    line-height: 1.2;
 
     input[type='checkbox'] {
       width: 18px;
       height: 18px;
       accent-color: #006c59;
       cursor: pointer;
+      vertical-align: middle;
+    }
+
+    span {
+      display: inline-block;
+      line-height: 1;
+      margin-bottom: 0.7rem;
     }
 
     &:hover {

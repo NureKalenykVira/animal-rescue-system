@@ -1,17 +1,17 @@
 <header class="site-header">
   <nav>
-    <a routerLink="/" class="logo">Animal Rescue</a>
+    <a routerLink="/home" class="logo">Animal Rescue</a>
 
     <button class="burger" (click)="toggleMenu()">&#9776;</button>
 
     <ul [class.open]="menuOpen">
-      <li><a routerLink="/">Про нас</a></li>
-      <li><a routerLink="/animal/volunteer-search">Переглянути тварин</a></li>
-      <li><a routerLink="/donate">Зробити донат</a></li>
+      <li><a routerLink="/about">Про нас</a></li>
+      <li><a routerLink="/animal/animal-list">Переглянути тварин</a></li>
+      <li><a routerLink="/donation/donation-list">Зробити донат</a></li>
 
       <ng-container *ngIf="isAuthenticated; else guestLinks">
         <li><a routerLink="/animal/user-profile">Мій профіль</a></li>
-        <li><a routerLink="/auth/login">Вийти</a></li>
+        <li><a routerLink="/auth/home">Вийти</a></li>
       </ng-container>
 
       <ng-template #guestLinks>

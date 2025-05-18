@@ -1,0 +1,175 @@
+<app-site-header></app-site-header>
+
+<main>
+<!-- Верхній заголовок на фоні -->
+<section class="about-hero">
+  <div class="overlay">
+    <h1>Про нашу систему допомоги тваринам</h1>
+  </div>
+</section>
+
+<!-- Якірне меню -->
+<nav class="about-nav">
+  <ul>
+    <li><a (click)="scrollTo('report')">Як повідомити про тварину?</a></li>
+    <li><a (click)="scrollTo('track')">Що відбувається після передачі тварини?</a></li>
+    <li><a (click)="scrollTo('donate')">Як задонатити?</a></li>
+    <li><a (click)="scrollTo('volunteer')">Як стати волонтером?</a></li>
+    <li><a (click)="scrollTo('vets')">Як долучитися лікарю?</a></li>
+    <li><a (click)="scrollTo('register')">Навіщо реєструватися?</a></li>
+    <li><a (click)="scrollTo('adopt')">Як прихистити тварину?</a></li>
+    <li><a (click)="scrollTo('anon')">Чи можна повідомити анонімно?</a></li>
+    <li><a (click)="scrollTo('mobile')">Мобільний додаток?</a></li>
+    <li><a (click)="scrollTo('video')">Відео-демонстрація</a></li>
+  </ul>
+</nav>
+
+<!-- Контентні блоки -->
+<section id="report" class="about-section">
+  <div class="text">
+    <h2>Як повідомити про тварину?</h2>
+    <div>
+      <p>Якщо ви стали свідком ситуації, де тварина виглядає загубленою, пораненою або залишеною без догляду — ви можете швидко повідомити про це через сайт.</p>
+      <p>Для цього на головній сторінці натисніть кнопку <strong>«Повідомити про тварину»</strong>. Перед вами відкриється форма, у якій потрібно:</p>
+      <ul>
+        <li>описати ситуацію: вказати, де саме ви бачили тварину та що викликало занепокоєння;</li>
+        <li>прикріпити фотографію (якщо є змога);</li>
+        <li>підтвердити місцезнаходження — автоматично або вручну на карті.</li>
+      </ul>
+      <p>Після надсилання ваша інформація потрапляє у систему, і ми передаємо її волонтеру, який працює поруч.</p>
+    </div>
+  </div>
+  <div class="image">
+    <img class="screenshot" src="/assets/screenshots/report.png" alt="Форма повідомлення" />
+  </div>
+</section>
+
+<section id="track" class="about-section reverse">
+  <div class="text">
+    <h2>Що відбувається після передачі тварини?</h2>
+    <div>
+      <p>Після того, як волонтер забирає тварину, він фіксує передачу в системі. У вашому профілі з’являється ця тварина з усією інформацією:</p>
+      <ul>
+        <li>стан тварини (наприклад: лікується, у клініці, випущений);</li>
+        <li>історія лікування — з фото, витратами та коментарями;</li>
+        <li>фінальний результат: усиновлення або випуск у природу.</li>
+      </ul>
+      <p>Ви можете переглядати статус у своєму кабінеті в будь-який момент.</p>
+    </div>
+  </div>
+  <div class="image">
+    <img class="screenshot" src="assets/screenshots/track.png" alt="Стан тварини у профілі" />
+  </div>
+</section>
+
+<section id="donate" class="about-section">
+  <div class="text">
+    <h2>Як задонатити?</h2>
+    <p>
+      На сторінці <strong>«Збори»</strong> ви побачите всі активні запити на допомогу. Кожен збір — це історія конкретної тварини, яка потребує коштів.
+      Натисніть кнопку <strong>«Задонатити»</strong> під збором. Ви перейдете на сторінку з описом, фото тварини та формою оплати. Заповніть її й натисніть «Надіслати». Ваша підтримка буде миттєво врахована.
+    </p>
+  </div>
+  <div class="image">
+    <img class="screenshot" src="assets/screenshots/donate.png" alt="Форма донату" />
+  </div>
+</section>
+
+<section id="volunteer" class="about-section reverse">
+  <div class="text">
+    <h2>Як стати волонтером?</h2>
+    <p>
+      Щоб стати волонтером, заповніть коротку анкету на сторінці <strong>«Стати волонтером»</strong>. Укажіть своє місто, номер телефону та як саме ви готові допомагати. Після підтвердження ви отримаєте запити на допомогу поруч із вами.
+    </p>
+  </div>
+  <div class="image">
+    <img class="screenshot" src="assets/screenshots/volunteer.png" alt="Форма волонтера" />
+  </div>
+</section>
+
+<section id="vets" class="about-section">
+  <div class="text">
+    <h2>Як долучитися лікарю або клініці?</h2>
+    <p>
+      Клініки та ветеринари можуть допомагати системно. Для цього потрібно заповнити форму або написати нам напряму. Після перевірки ваша клініка з’явиться на карті, а ви отримаєте запити на лікування тварин поруч із вами.
+    </p>
+  </div>
+  <div class="image">
+    <img class="screenshot" src="assets/screenshots/vets.png" alt="Карта клінік" />
+  </div>
+</section>
+
+<section id="register" class="about-section reverse">
+  <div class="text">
+    <h2>Навіщо реєструватися?</h2>
+    <p>
+      Зареєстрований користувач має доступ до персонального кабінету: ви бачите історії тварин, про яких повідомили, отримуєте сповіщення, можете волонтерити, донатити, коментувати й бути частиною спільноти.
+    </p>
+  </div>
+  <div class="image">
+    <img class="screenshot" src="assets/screenshots/register.png" alt="Сторінка профілю" />
+  </div>
+</section>
+
+<section id="adopt" class="about-section">
+  <div class="text">
+    <h2>Як прихистити тварину?</h2>
+    <p>
+      Якщо ви хочете взяти тварину додому — шукайте тих, у кого статус <strong>«Шукає дім»</strong>. Натисніть <strong>«Подати заявку»</strong>, і після перевірки волонтер зв’яжеться з вами для уточнення.
+    </p>
+  </div>
+  <div class="image">
+    <img class="screenshot" src="assets/screenshots/adopt.png" alt="Картка тварини з кнопкою" />
+  </div>
+</section>
+
+<section id="anon" class="about-section  reverse">
+  <div class="text">
+    <h2>Чи можна повідомити анонімно?</h2>
+    <p>
+      Так, ви можете повідомити про тварину без входу в систему. Але тоді ви не зможете стежити за її станом, отримувати оновлення чи скасувати заявку. Краще зареєструватися — це зручно й безпечно.
+    </p>
+  </div>
+  <div class="image">
+    <img class="screenshot" src="assets/screenshots/anon.png" alt="Форма без входу" />
+  </div>
+</section>
+
+<section id="mobile" class="about-section">
+  <div class="text">
+    <h2>Мобільний додаток</h2>
+    <div>
+      <p>Ви можете користуватись нашою системою ще зручніше через мобільний застосунок. Він дозволяє:</p>
+      <ul>
+        <li>швидко повідомити про тварину прямо з вулиці;</li>
+        <li>переглядати свої заявки та статус тварин;</li>
+        <li>донатити або волонтерити в один клік.</li>
+      </ul>
+      <p>
+        Додаток наразі доступний для Android. Натисніть, щоб встановити:
+        <br />
+        <a href=" " target="_blank">
+          <img src="assets/img/google-play-icon.png" alt="Google Play" class="store-img" />
+        </a>
+      </p>
+    </div>
+  </div>
+  <div class="image">
+    <img class="screenshot" src="assets/screenshots/mobile-app.png" alt="Мобільний додаток" />
+  </div>
+</section>
+
+<section id="video" class="about-section">
+  <div class="text">
+    <h2>Відео-демонстрація</h2>
+    <p>Подивіться коротке відео, яке покаже, як користуватись нашим сайтом крок за кроком.</p>
+    <video controls width="100%">
+      <source src="assets/video/demo.mp4" type="video/mp4" />
+      Ваш браузер не підтримує відео.
+    </video>
+  </div>
+</section>
+
+</main>
+
+<app-site-footer></app-site-footer>

@@ -43,10 +43,11 @@
   .footer-columns {
     display: flex;
     gap: 3rem;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
 
     .footer-col {
-      min-width: 100px;
+      flex: 1 1 0;
+      min-width: 0;
 
       .footer-topic {
         font-weight: 600;

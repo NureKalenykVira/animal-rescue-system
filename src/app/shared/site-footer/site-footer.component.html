@@ -15,7 +15,7 @@
         <p class="footer-topic">{{ topic.title }}</p>
         <ul>
           <li *ngFor="let page of topic.pages">
-            <a href="#">{{ page }}</a>
+            <a [routerLink]="page.link">{{ page.name }}</a>
           </li>
         </ul>
       </div>

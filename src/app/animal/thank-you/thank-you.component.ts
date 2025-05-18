@@ -3,6 +3,7 @@
 import { AfterViewInit, Component, ElementRef, ViewChild, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { NgIf } from '@angular/common';
+import { Router } from '@angular/router';
 
 declare global {
   interface Window {
@@ -26,7 +27,7 @@ export class ThankYouComponent implements OnInit, AfterViewInit {
   clinics: google.maps.places.PlaceResult[] = [];
   directionsRenderer!: google.maps.DirectionsRenderer;
 
-  constructor(private route: ActivatedRoute) {}
+  constructor(private route: ActivatedRoute, private router: Router) {}
 
   ngOnInit(): void {
     this.route.queryParamMap.subscribe((params) => {
@@ -145,4 +146,8 @@ export class ThankYouComponent implements OnInit, AfterViewInit {
     }
   );
 }
+
+  goTo(): void {
+    this.router.navigate(['/home']);
+  }
 }

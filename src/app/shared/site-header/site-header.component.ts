@@ -1,9 +1,10 @@
 import { Component } from '@angular/core';
 import { NgIf } from '@angular/common';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-site-header',
-  imports: [NgIf],
+  imports: [NgIf, RouterModule],
   templateUrl: './site-header.component.html',
   styleUrl: './site-header.component.scss'
 })

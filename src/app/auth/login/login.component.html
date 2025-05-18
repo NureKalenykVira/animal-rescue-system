@@ -1,6 +1,6 @@
 <div class="login-container">
   <div class="login-form">
-    <button class="back-btn">← Назад</button>
+    <button class="back-btn" (click)="goBack()">← Назад</button>
     <h1>Увійти</h1>
 
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">

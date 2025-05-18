@@ -5,7 +5,7 @@
     <p>
       Після передання тваринки до найближчого центру, будь ласка, підтвердьте успішне передання тварини персоналу:
     </p>
-    <button class="action-button">Передано</button>
+    <button class="action-button" (click)="goTo()">Передано</button>
     </div>
     <h2 class="section-title">Вет-клініки поруч:</h2>
     <div #map class="map-container"></div>
@@ -17,7 +17,7 @@
     <p>
       Щоб Ви мали змогу слідкувати за долею тваринки далі, вона буде додана до Вашого профілю
     </p>
-    <button class="action-button" routerLink="/">На головну сторінку</button>
+    <button class="action-button" routerLink="/home">На головну сторінку</button>
   </div>
 </ng-template>
 </div>

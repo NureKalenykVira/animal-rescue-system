@@ -56,6 +56,8 @@ export class ReportComponent implements AfterViewInit {
       console.log('Form data:', this.reportForm.value);
       console.log('Координати:', this.selectedCoords);
       console.log('Адреса:', this.selectedAddress);
+
+      this.router.navigate(['/animal/volunteer-search']);
     } else {
       this.reportForm.markAllAsTouched();
     }
@@ -142,5 +144,9 @@ export class ReportComponent implements AfterViewInit {
     // коли буде бекенд — отримаємо з authService
     const token = localStorage.getItem('token'); // або sessionStorage
     this.isAuthenticated = !token;
+  }
+
+  goBack(): void {
+    this.router.navigate(['/home']);
   }
 }

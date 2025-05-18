@@ -29,4 +29,8 @@ export class RegisterComponent {
       this.router.navigate(['/auth/login'], { queryParams: { returnTo: '/animal/report' } });
     }
   }
+
+  goBack(): void {
+    this.router.navigate(['/home']);
+  }
 }

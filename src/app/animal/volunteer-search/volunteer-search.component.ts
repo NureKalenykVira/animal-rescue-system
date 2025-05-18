@@ -30,6 +30,10 @@ export class VolunteerSearchComponent implements AfterViewInit {
     }
   };
   checkIfGoogleLoaded();
+
+  setTimeout(() => {
+    this.router.navigate(['/animal/volunteer-waiting']);
+  }, 30000);
 }
 
   initMap(): void {
