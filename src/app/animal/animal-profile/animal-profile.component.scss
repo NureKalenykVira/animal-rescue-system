@@ -272,3 +272,34 @@
   }
 }
 
+.treatment-history.styled {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 2rem 0;
+
+  .treatment-entry {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 1rem;
+    background: #f6f6f6;
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+
+    .treatment-date {
+      color: #888;
+      min-width: 110px;
+    }
+
+    .treatment-desc {
+      flex-grow: 1;
+      margin: 0 1rem;
+    }
+
+    .treatment-cost {
+      font-weight: bold;
+      color: #006c59;
+    }
+  }
+}
+

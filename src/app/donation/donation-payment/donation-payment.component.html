@@ -2,15 +2,15 @@
   <button class="back-btn" (click)="goBack()">← Назад</button>
 
   <div class="payment-layout">
-    <!-- 🔹 Фото тварини / збору -->
+    <!-- Фото тварини / збору -->
     <div class="payment-photo">
-      <img [src]="donation.imageUrl" alt="Фото збору" />
+      <img src="/assets/img/raccoon.jpg" alt="Фото збору" />
     </div>
 
-    <!-- 🔸 Платіжна форма -->
+    <!-- Платіжна форма -->
     <form [formGroup]="donationForm" (ngSubmit)="submitDonation()" class="payment-form">
       <h1> Дякуємо за турботу! </h1>
-      <h4>{{ donation.title }}</h4>
+      <h4>{{ donation.name }}</h4>
       <p>{{ donation.description }}</p>
 
       <h3>Сума донату (грн)</h3>
@@ -20,9 +20,7 @@
       </div>
 
       <h3>Оплатити через</h3>
-      <button type="submit" class="paypal-btn">
-        <img src="/assets/img/paypal.png" alt="PayPal" />
-      </button>
+      <div id="paypal-button-container" class="paypal-btn"></div>
 
       <h3>Оплатити картою</h3>
 

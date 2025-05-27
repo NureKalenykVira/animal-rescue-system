@@ -21,9 +21,9 @@
     <div class="input-group">
       <label>Стать</label>
       <div class="radio-group">
-        <label><input type="radio" value="дівчина" formControlName="gender" /> Дівчина</label>
-        <label><input type="radio" value="хлопець" formControlName="gender" /> Хлопець</label>
-        <label><input type="radio" value="невідомо" formControlName="gender" /> Невідомо</label>
+        <label><input type="radio" value="Дівчинка" formControlName="gender" /> Дівчина</label>
+        <label><input type="radio" value="Хлопчик" formControlName="gender" /> Хлопець</label>
+        <label><input type="radio" value="Невідомо" formControlName="gender" /> Невідомо</label>
       </div>
       <div class="error" *ngIf="reportForm.get('gender')?.touched && reportForm.get('gender')?.invalid"> Виберіть стать </div>
     </div>

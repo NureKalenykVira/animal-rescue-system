@@ -110,6 +110,7 @@
     font-weight: 500;
     border: none;
     margin-top: 20px;
+    min-width: 20%;
     cursor: pointer;
     transition: background-color 0.2s ease;
 
@@ -117,3 +118,25 @@
       background-color: #e2e8f0;
     }
 }
+
+.button-wrapper {
+  text-align: right;
+}
+
+.google-route-button {
+  margin-top: 1rem;
+  background-color: #ffffff;
+  border: 2px solid #006c59;
+  color: #006c59;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: #006c59;
+    color: white;
+  }
+}
+

@@ -1,30 +1,29 @@
 /// <reference types="@types/google.maps" />
 
-import { AfterViewInit, Component, ElementRef, ViewChild, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  ViewChild,
+  OnInit
+} from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { NgIf } from '@angular/common';
-import { Router } from '@angular/router';
-
-declare global {
-  interface Window {
-    initMap: () => void;
-  }
-}
-declare const google: any;
 
 @Component({
   selector: 'app-thank-you',
+  standalone: true,
   imports: [NgIf],
   templateUrl: './thank-you.component.html',
   styleUrls: ['./thank-you.component.scss']
 })
 export class ThankYouComponent implements OnInit, AfterViewInit {
   method: string | null = null;
+  selectedClinicCoords: google.maps.LatLngLiteral | null = null;
 
   @ViewChild('map', { static: false }) mapElement!: ElementRef;
   map!: google.maps.Map;
   userCoords: google.maps.LatLngLiteral | null = null;
-  clinics: google.maps.places.PlaceResult[] = [];
   directionsRenderer!: google.maps.DirectionsRenderer;
 
   constructor(private route: ActivatedRoute, private router: Router) {}
@@ -79,32 +78,84 @@ export class ThankYouComponent implements OnInit, AfterViewInit {
             }
           });
 
-          const service = new google.maps.places.PlacesService(this.map);
-          service.nearbySearch(
+          const placesService = new google.maps.places.PlacesService(this.map);
+          const distanceService = new google.maps.DistanceMatrixService();
+
+          placesService.nearbySearch(
             {
               location: this.userCoords,
               radius: 100000,
               keyword: 'ветеринарна клініка'
             },
-            (results: google.maps.places.PlaceResult[] | null, status: google.maps.places.PlacesServiceStatus) => {
-              if (
-                status === google.maps.places.PlacesServiceStatus.OK &&
-                results
-              ) {
-                this.clinics = results;
-
+            (results, status) => {
+              if (status === google.maps.places.PlacesServiceStatus.OK && results) {
                 results.forEach((place: any) => {
-                  if (place.geometry?.location) {
-                    const marker = new google.maps.Marker({
-                      map: this.map,
-                      position: place.geometry.location,
-                      title: place.name
-                    });
+                  if (!place.geometry?.location) return;
 
-                    marker.addListener('click', () => {
-                      this.buildRoute(place.geometry.location);
-                     });
-                  }
+                  const destination = place.geometry.location;
+
+                  const marker = new google.maps.Marker({
+                    map: this.map,
+                    position: destination,
+                    title: place.name
+                  });
+
+                  // Пішки
+                  distanceService.getDistanceMatrix({
+                    origins: [this.userCoords!],
+                    destinations: [destination],
+                    travelMode: google.maps.TravelMode.WALKING
+                  }, (walkRes, walkStatus) => {
+                    if (walkStatus !== 'OK' || !walkRes) return;
+                    const walkTime = walkRes.rows[0].elements[0].duration.text;
+
+                    // Машиною
+                    distanceService.getDistanceMatrix({
+                      origins: [this.userCoords!],
+                      destinations: [destination],
+                      travelMode: google.maps.TravelMode.DRIVING
+                    }, (driveRes, driveStatus) => {
+                      if (driveStatus !== 'OK' || !driveRes) return;
+                      const driveTime = driveRes.rows[0].elements[0].duration.text;
+
+                      const infoWindow = new google.maps.InfoWindow({
+                        content: `
+                          <div style="font-size: 14px; color: #000; min-width: 240px; padding: 6px;">
+                            <div style="font-weight: bold; font-size: 15px;">${place.name}</div>
+                            <div style="color: #555; margin-bottom: 6px;">${place.vicinity || 'Адресу не знайдено'}</div>
+                            <div style="font-size: 13px; margin-bottom: 8px;">
+                              🚶 ${walkTime} пішки<br/>
+                              🚗 ${driveTime} машиною
+                            </div>
+                            <button id="choose-btn" style="
+                              background-color: #006c59;
+                              color: white;
+                              border: none;
+                              padding: 6px 12px;
+                              border-radius: 4px;
+                              cursor: pointer;
+                            ">
+                              Обрати
+                            </button>
+                          </div>
+                        `
+                      });
+
+                      marker.addListener('click', () => {
+                        infoWindow.open(this.map, marker);
+
+                        google.maps.event.addListenerOnce(infoWindow, 'domready', () => {
+                          const btn = document.getElementById('choose-btn');
+                          if (btn) {
+                            btn.addEventListener('click', () => {
+                              this.buildRoute(destination);
+                              infoWindow.close();
+                            });
+                          }
+                        });
+                      });
+                    });
+                  });
                 });
               }
             }
@@ -117,35 +168,42 @@ export class ThankYouComponent implements OnInit, AfterViewInit {
     }
   }
 
-  buildRoute(destinationRaw: google.maps.LatLng | google.maps.LatLngLiteral) {
-  if (!this.userCoords || !destinationRaw) return;
+  buildRoute(destinationRaw: google.maps.LatLng | google.maps.LatLngLiteral): void {
+    if (!this.userCoords || !destinationRaw) return;
 
-  const destination: google.maps.LatLngLiteral = {
-    lat: (destinationRaw as google.maps.LatLng).lat
-      ? (destinationRaw as google.maps.LatLng).lat()
-      : (destinationRaw as google.maps.LatLngLiteral).lat,
-    lng: (destinationRaw as google.maps.LatLng).lng
-      ? (destinationRaw as google.maps.LatLng).lng()
-      : (destinationRaw as google.maps.LatLngLiteral).lng
-  };
+    const destination: google.maps.LatLngLiteral = {
+      lat: (destinationRaw as google.maps.LatLng).lat
+        ? (destinationRaw as google.maps.LatLng).lat()
+        : (destinationRaw as google.maps.LatLngLiteral).lat,
+      lng: (destinationRaw as google.maps.LatLng).lng
+        ? (destinationRaw as google.maps.LatLng).lng()
+        : (destinationRaw as google.maps.LatLngLiteral).lng
+    };
 
-  const directionsService = new google.maps.DirectionsService();
+    const directionsService = new google.maps.DirectionsService();
 
-  directionsService.route(
-    {
-      origin: this.userCoords,
-      destination: destination,
-      travelMode: google.maps.TravelMode.DRIVING
-    },
-    (response: google.maps.DirectionsResult, status: google.maps.DirectionsStatus) => {
-      if (status === google.maps.DirectionsStatus.OK) {
-        this.directionsRenderer.setDirections(response);
-      } else {
-        alert('Не вдалося побудувати маршрут');
+    directionsService.route(
+      {
+        origin: this.userCoords,
+        destination: destination,
+        travelMode: google.maps.TravelMode.DRIVING
+      },
+      (response, status) => {
+        if (status === google.maps.DirectionsStatus.OK) {
+          this.directionsRenderer.setDirections(response);
+          this.selectedClinicCoords = destination;
+        } else {
+          alert('Не вдалося побудувати маршрут');
+        }
       }
-    }
-  );
-}
+    );
+  }
+
+  openInGoogleMaps(): void {
+    if (!this.userCoords || !this.selectedClinicCoords) return;
+    const url = `https://www.google.com/maps/dir/?api=1&origin=${this.userCoords.lat},${this.userCoords.lng}&destination=${this.selectedClinicCoords.lat},${this.selectedClinicCoords.lng}&travelmode=driving`;
+    window.open(url, '_blank');
+  }
 
   goTo(): void {
     this.router.navigate(['/home']);

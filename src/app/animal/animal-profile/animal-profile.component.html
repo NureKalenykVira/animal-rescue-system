@@ -2,156 +2,124 @@
 
 <main class="animal-profile-container">
   <!-- Для волонтера та ветеринара -->
-  <ng-container *ngIf="canEdit; else readOnlyBlock">
+  <ng-container *ngIf="canEdit && animal && animalForm; else readOnlyBlock">
     <div class="admin-layout">
-    <!-- 🔹 Ліва колонка — дані про тварину -->
-    <div class="admin-left">
-      <h2>Дані про тварину</h2>
+      <!-- Ліва колонка — дані про тварину -->
+      <div class="admin-left">
+        <h2>Дані про тварину</h2>
 
-      <div class="info-group">
-        <label>Ім’я</label>
-        <ng-container *ngIf="isEditing; else viewName">
-          <input type="text" formControlName="name" />
-        </ng-container>
-        <ng-template #viewName>
-          <input [value]="animal.name" disabled />
-        </ng-template>
+        <form [formGroup]="animalForm" class="info-group">
+          <label>Ім’я</label>
+          <input type="text" formControlName="name" [disabled]="!isEditing" />
 
-        <label>Назва</label>
-        <ng-container *ngIf="isEditing; else viewBreed">
-          <input type="text" formControlName="breed" />
-        </ng-container>
-        <ng-template #viewBreed>
-          <input [value]="animal.breed" disabled />
-        </ng-template>
+          <label>Порода</label>
+          <input type="text" formControlName="breed" [disabled]="!isEditing" />
 
-        <label>Стать</label>
-        <ng-container *ngIf="isEditing; else viewGender">
-          <select formControlName="gender">
+          <label>Стать</label>
+          <select formControlName="gender" [disabled]="!isEditing">
             <option value="Дівчинка">Дівчинка</option>
             <option value="Хлопчик">Хлопчик</option>
             <option value="Невідомо">Невідомо</option>
           </select>
-        </ng-container>
-        <ng-template #viewGender>
-          <input [value]="animal.gender" disabled />
-        </ng-template>
 
-        <label>Дата знаходження</label>
-        <input [value]="animal.foundDate" disabled />
+          <label>Дата знаходження</label>
+          <input [value]="animal.foundDate" disabled />
 
-        <label>Місце знаходження</label>
-        <input [value]="animal.location" disabled />
+          <label>Місце знаходження</label>
+          <input [value]="animal.location" disabled />
 
-        <label>Статус</label>
-        <ng-container *ngIf="isEditing; else viewStatus">
-          <select formControlName="status">
-            <option [value]="0">Новоприбулий</option>
-            <option [value]="1">На лікуванні</option>
-            <option [value]="2">Здоровий</option>
-            <option [value]="3">Усиновлений</option>
+          <label>Статус</label>
+          <select formControlName="status" [disabled]="!isEditing">
+            <option *ngFor="let key of getStatusKeys()" [value]="key">{{ statusLabels[key] }}</option>
           </select>
-        </ng-container>
-        <ng-template #viewStatus>
-          <input [value]="statusLabels[animal.status]" disabled />
-        </ng-template>
 
-        <label>Опис</label>
-        <ng-container *ngIf="isEditing; else viewDescription">
-          <textarea formControlName="description"></textarea>
-        </ng-container>
-        <ng-template #viewDescription>
-          <textarea [value]="animal.description" disabled></textarea>
-        </ng-template>
+          <label>Опис</label>
+          <textarea formControlName="description" [disabled]="!isEditing"></textarea>
+        </form>
+
+        <h3>Клініка</h3>
+        <div class="info-group">
+          <label>Назва</label>
+          <input [value]="animal.vetClinic?.name" disabled />
+          <label>Адреса</label>
+          <input [value]="animal.vetClinic?.address" disabled />
+          <label>Телефон</label>
+          <input [value]="animal.vetClinic?.phone" disabled />
+        </div>
+
+        <h3>Відповідальний лікар</h3>
+        <div class="info-group">
+          <label>Ім’я</label>
+          <input [value]="animal.responsibleUser?.name" disabled />
+          <label>Телефон</label>
+          <input [value]="animal.responsibleUser?.phone" disabled />
+        </div>
+
+        <h3>Відповідальний волонтер</h3>
+        <div class="info-group">
+          <label>Ім’я</label>
+          <input [value]="animal.responsibleVolunteer?.name" disabled />
+          <label>Телефон</label>
+          <input [value]="animal.responsibleVolunteer?.phone" disabled />
+        </div>
+
+        <div class="form-buttons" *ngIf="animalForm">
+          <button *ngIf="!isEditing" class="green full-width" type="button" (click)="startEdit()">Змінити</button>
+          <button *ngIf="isEditing" class="grey full-width" type="button" (click)="saveChanges()">Зберегти зміни</button>
+        </div>
       </div>
 
-      <h3>Клініка</h3>
-      <div class="info-group">
-        <label>Назва</label>
-        <input [value]="animal.vetClinic.name" disabled />
+      <!-- Права колонка — фото + лікування -->
+      <div class="admin-right">
+        <div class="photo-wrapper">
+          <img [src]="photoPreview || 'assets/img/animal-default.jpg'"
+               alt="Фото тварини"
+               width="400" height="400" style="object-fit: cover; border-radius: 8px;" />
+          <label class="admin-upload-btn" *ngIf="canEdit && !isEditing">
+            Завантажити / змінити фото
+            <input type="file" accept="image/*" (change)="onPhotoSelected($event)" hidden />
+          </label>
+        </div>
 
-        <label>Адреса</label>
-        <input [value]="animal.vetClinic.address" disabled />
+        <form [formGroup]="treatmentForm" (ngSubmit)="addTreatment()" class="treatment-form">
+          <h3>Додати лікування</h3>
 
-        <label>Телефон</label>
-        <input [value]="animal.vetClinic.phone" disabled />
-      </div>
+          <label>Опис лікування</label>
+          <textarea formControlName="description" [disabled]="!canEdit"></textarea>
 
-      <h3>Відповідальний лікар</h3>
-      <div class="info-group">
-        <label>Ім’я</label>
-        <input [value]="animal.responsibleUser.name" disabled />
+          <label>Витрати (грн)</label>
+          <input type="number" step="0.01" formControlName="moneySpent" [disabled]="!canEdit" />
 
-        <label>Телефон</label>
-        <input [value]="animal.responsibleUser.phone" disabled />
-      </div>
+          <button type="submit" class="green-add">Додати</button>
+        </form>
 
-      <h3>Відповідальний волонтер</h3>
-      <div class="info-group">
-        <label>Ім’я</label>
-        <input [value]="animal.responsibleVolunteer.name" disabled />
-
-        <label>Телефон</label>
-        <input [value]="animal.responsibleVolunteer.phone" disabled />
-      </div>
-
-      <div class="form-buttons">
-        <button  *ngIf="!isEditing" class="green full-width"  type="button"   (click)="startEdit()">  Змінити </button>
-        <button  *ngIf="isEditing" class="grey full-width" type="button" (click)="saveChanges()" > Зберегти зміни </button>
+        <h3>Історія тварини</h3>
+        <ul class="treatment-history">
+          <li *ngFor="let report of treatmentReports">
+            {{ report.created_at }} — {{ report.description }} ({{ report.money_spent }} грн)
+          </li>
+        </ul>
       </div>
     </div>
-
-    <!-- 🔹 Права колонка — фото + лікування -->
-    <div class="admin-right">
-      <div class="photo-wrapper">
-        <img [src]="photoPreview || animal.photoUrl || 'assets/img/animal-default.jpg'"
-             alt="Фото тварини"
-             width="400" height="400" style="object-fit: cover; border-radius: 8px;" />
-        <label class="admin-upload-btn" *ngIf="canEdit">
-          Завантажити / змінити фото
-          <input type="file" accept="image/*" (change)="onPhotoSelected($event)" hidden />
-        </label>
-      </div>
-
-      <form [formGroup]="treatmentForm" (ngSubmit)="addTreatment()" class="treatment-form">
-        <h3>Додати лікування</h3>
-
-        <label>Опис лікування</label>
-        <textarea formControlName="description" [disabled]="!canEdit"></textarea>
-
-        <label>Витрати (грн)</label>
-        <input type="number" step="0.01" formControlName="moneySpent" [disabled]="!canEdit" />
-
-        <button type="submit" class="green-add">Додати</button>
-      </form>
-
-      <h3>Історія тварини</h3>
-      <ul class="treatment-history">
-        <li *ngFor="let report of treatmentReports">
-          {{ report.created_at | date:'short' }} — {{ report.description }} ({{ report.money_spent }} грн)
-        </li>
-      </ul>
-    </div>
-  </div>
   </ng-container>
 
   <!-- Для звичайного користувача -->
   <ng-template #readOnlyBlock>
-    <section class="animal-section">
+    <section class="animal-section" *ngIf="animal as a">
       <div class="animal-photo">
-        <img [src]="animal.photoUrl || 'assets/img/deer.jpg'" alt="Фото тварини" />
+        <img [src]="photoPreview || 'assets/img/animal-default.jpg'" alt="Фото тварини" />
       </div>
       <div class="animal-info">
-        <h1>Я – [{{ animal.name }}]</h1>
+        <h1>Привіт! Мене звати {{ a.name }}</h1>
         <p>
-          Я — {{ animal.gender }} {{ animal.name }}. Мене знайшли {{ animal.foundDate }}
-          біля {{ animal.location }}. Наразі я перебуваю в {{ animal.center }}.
+          Я — {{ a.breed ? a.breed : 'тваринка' }}. Мене знайшли {{ animal.foundDate }}, і зараз я {{ statusText }}.
         </p>
-        <p class="qr-note">
-          Історію лікування, а також відповідальних лікарів та волонтерів можна знайти за qr-кодом:
+        <p>
+          Мені дуже потрібна твоя турбота — ти можеш стежити за моєю історією, підтримати або навіть прихистити мене 💚
         </p>
-        <div class="qr-wrapper">
-          <img [src]="animal.qrCodeUrl || 'assets/img/qr-placeholder.png'" alt="QR-код" />
+        <div class="qr-container" style="margin-top: 1rem;">
+          <h3>QR-код профілю</h3>
+          <div id="qrCode"></div>
         </div>
         <button
           [disabled]="!isAuthenticated"
@@ -160,6 +128,16 @@
           (click)="toggleFollow()">
           {{ isFollowing ? 'Перестати слідкувати за твариною' : 'Стежити за твариною' }}
         </button>
+        <h3>Історія лікування</h3>
+        <ul class="treatment-history styled">
+          <li *ngFor="let report of treatmentReports">
+            <div class="treatment-entry">
+              <span class="treatment-date">{{ report.created_at }}</span>
+              <span class="treatment-desc">{{ report.description }}</span>
+              <span class="treatment-cost">{{ report.money_spent }} грн</span>
+            </div>
+          </li>
+        </ul>
       </div>
     </section>
   </ng-template>

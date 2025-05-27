@@ -1,9 +1,23 @@
 /// <reference types="@types/google.maps" />
-
-import { Component, AfterViewInit, ElementRef, ViewChild } from '@angular/core';
+import { Component, AfterViewInit, ElementRef, ViewChild, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { NgIf } from '@angular/common';
 import { Router } from '@angular/router';
+import { AnimalService } from '../../services/animal.service';
+import { HttpClient } from '@angular/common/http';
+import { inject } from '@angular/core';
+import { HttpBackend } from '@angular/common/http';
+
+interface ReportPayload {
+  name: string;
+  breed: string;
+  gender: number;
+  notes: string;
+  latitude: number;
+  longitude: number;
+  media_ids: number[];
+  email?: string;
+}
 
 @Component({
   selector: 'app-report',
@@ -12,21 +26,30 @@ import { Router } from '@angular/router';
   templateUrl: './report.component.html',
   styleUrl: './report.component.scss'
 })
-export class ReportComponent implements AfterViewInit {
+export class ReportComponent implements AfterViewInit, OnInit {
   reportForm: FormGroup;
+  httpNoAuth = new HttpClient(inject(HttpBackend));
 
   photoURL: string | null = null;
   selectedFileName: string | null = null;
+  selectedPhoto: File | null = null;
 
   selectedAddress: string | null = null;
   selectedCoords: { lat: number, lng: number } | null = null;
 
   @ViewChild('map', { static: false }) mapElement!: ElementRef;
-
   private map!: google.maps.Map;
   private marker!: google.maps.Marker;
 
-  constructor(private fb: FormBuilder, private router: Router) {
+  apiUrl = 'https://kkp-api.ruslan.page/api';
+  isAuthenticated = false;
+
+  constructor(
+    private fb: FormBuilder,
+    private router: Router,
+    private http: HttpClient,
+    private animalService: AnimalService,
+  ) {
     this.reportForm = this.fb.group({
       name: ['', Validators.required],
       type: ['', Validators.required],
@@ -39,33 +62,130 @@ export class ReportComponent implements AfterViewInit {
     });
   }
 
-  onSubmit(): void {
-    if (!this.selectedAddress) {
-      this.reportForm.get('location')?.setErrors({ required: true });
+  ngOnInit(): void {
+    const token = localStorage.getItem('access_token');
+    this.isAuthenticated = !!token;
+
+    if (!this.isAuthenticated) {
+      this.reportForm.get('email')?.setValidators([Validators.required, Validators.email]);
     } else {
-      this.reportForm.get('location')?.setValue(this.selectedAddress);
+      this.reportForm.get('email')?.clearValidators();
     }
 
-    if (!this.photoURL) {
-      this.reportForm.get('photo')?.setErrors({ required: true });
-    } else {
-      this.reportForm.get('photo')?.setValue(this.selectedFileName);
-    }
-
-    if (this.reportForm.valid) {
-      console.log('Form data:', this.reportForm.value);
-      console.log('Координати:', this.selectedCoords);
-      console.log('Адреса:', this.selectedAddress);
-
-      this.router.navigate(['/animal/volunteer-search']);
-    } else {
-      this.reportForm.markAllAsTouched();
-    }
+    this.reportForm.get('email')?.updateValueAndValidity();
   }
+
+  onSubmit(): void {
+  console.log('onSubmit() called');
+
+  if (!this.selectedAddress) {
+    this.reportForm.get('location')?.setErrors({ required: true });
+    console.warn('Адреса не вибрана');
+  } else {
+    this.reportForm.get('location')?.setValue(this.selectedAddress);
+  }
+
+  if (!this.photoURL) {
+    this.reportForm.get('photo')?.setErrors({ required: true });
+    console.warn('Фото не вибране');
+  } else {
+    this.reportForm.get('photo')?.setValue(this.selectedFileName);
+  }
+
+  console.log('Form valid:', this.reportForm.valid);
+  console.log('Coords:', this.selectedCoords);
+  console.log('Photo:', this.selectedPhoto);
+
+  if (this.reportForm.valid && this.selectedCoords && this.selectedPhoto) {
+    const file = this.selectedPhoto;
+    console.log('Починаємо створення media...');
+
+    const mediaPayload = {
+      type: 1,
+      size: file.size
+    };
+
+    this.httpNoAuth.post<any>(`${this.apiUrl}/media`, mediaPayload).subscribe({
+      next: (res: any) => {
+        console.log('Media створено:', res);
+        const mediaId = res.id;
+        const uploadUrl = res.upload_url;
+
+        console.log('Завантаження фото на:', uploadUrl);
+        fetch(uploadUrl, {
+          method: 'PUT',
+          body: file,
+          headers: {
+            'Content-Type': file.type
+          }
+        })
+          .then(() => {
+            console.log('Фото завантажено, фіналізуємо...');
+            return this.httpNoAuth.post(`${this.apiUrl}/media/${mediaId}/finalize`, {}).toPromise();
+          })
+          .then(() => {
+            console.log('Фіналізація завершена. Відправка звіту...');
+            const genderRaw = this.reportForm.value.gender;
+            const genderMap: { [key: string]: number } = {
+              'Дівчинка': 2,
+              'Хлопчик': 1,
+              'Невідомо': 0
+            };
+            const gender = typeof genderRaw === 'string' ? genderMap[genderRaw] ?? 0 : genderRaw;
+
+            const reportPayload: ReportPayload = {
+              name: this.reportForm.value.name,
+              breed: this.reportForm.value.type,
+              gender: gender,
+              notes: this.reportForm.value.notes,
+              latitude: this.selectedCoords!.lat,
+              longitude: this.selectedCoords!.lng,
+              media_ids: [mediaId]
+            };
+
+            if (!this.isAuthenticated) {
+              reportPayload.email = this.reportForm.value.email;
+            }
+
+            this.animalService.reportAnimal(reportPayload).subscribe({
+              next: (report: any) => {
+                console.log('Звіт надіслано');
+                this.router.navigate(['/animal/volunteer-search'], {
+                  state: { reportId: report.id },
+                });
+              },
+              error: (err) => {
+                console.error('Помилка при надсиланні звіту:', err);
+                this.reportForm.setErrors({ submit: true });
+              }
+            });
+          })
+          .catch((err) => {
+            console.error('Помилка при завантаженні фото:', err);
+            this.reportForm.setErrors({ upload: true });
+          });
+      },
+      error: (err) => {
+        console.error('Помилка при створенні media:', err);
+        this.reportForm.setErrors({ media: true });
+      }
+    });
+  } else {
+    this.reportForm.markAllAsTouched();
+    Object.keys(this.reportForm.controls).forEach((key) => {
+      const control = this.reportForm.get(key);
+      if (control && control.invalid) {
+        console.warn(`Поле "${key}" невалідне:`, control.errors);
+      }
+    });
+    console.warn('Форма невалідна або відсутні координати / фото');
+  }
+}
 
   onPhotoSelected(event: Event): void {
     const file = (event.target as HTMLInputElement)?.files?.[0];
     if (file) {
+      this.selectedPhoto = file;
       this.selectedFileName = file.name;
       const reader = new FileReader();
       reader.onload = () => {
@@ -96,7 +216,6 @@ export class ReportComponent implements AfterViewInit {
     const geocoder = new google.maps.Geocoder();
     const marker = new google.maps.Marker({ map });
 
-    // Відцентровка карти за геолокацією пристрою
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         position => {
@@ -121,10 +240,8 @@ export class ReportComponent implements AfterViewInit {
       geocoder.geocode({ location: latLng }, (results, status) => {
         if (status === 'OK' && results && results[0]) {
           this.selectedAddress = results[0].formatted_address;
-          console.log('Адреса з геокодера:', this.selectedAddress);
         } else {
           this.selectedAddress = 'Адресу не знайдено';
-          console.warn('Geocoder status:', status);
         }
       });
     });
@@ -136,14 +253,6 @@ export class ReportComponent implements AfterViewInit {
 
   goToLogin(): void {
     this.router.navigate(['/auth/login'], { queryParams: { returnTo: '/animal/report' } });
-  }
-
-  isAuthenticated = false; // тимчасово false
-
-  ngOnInit(): void {
-    // коли буде бекенд — отримаємо з authService
-    const token = localStorage.getItem('token'); // або sessionStorage
-    this.isAuthenticated = !token;
   }
 
   goBack(): void {

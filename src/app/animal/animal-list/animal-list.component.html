@@ -2,7 +2,7 @@
 
 <main class="animal-list-container">
 
-  <!-- 🔹 Верхня секція для неавторизованих -->
+  <!-- Секція для неавторизованих -->
   <section class="hero-section" [ngClass]="isAuthenticated ? 'bear-bg' : 'forest-bg'">
     <div class="hero-content">
       <h1>{{ isAuthenticated
@@ -15,7 +15,31 @@
     </div>
   </section>
 
-  <!-- 🔹 Список тварин -->
+  <section class="filter-controls">
+    <label class="filter-group">
+      Стан:
+      <select [(ngModel)]="selectedStatus" (change)="applyFilters()">
+        <option [value]="''">Усі</option>
+        <option value="1">Знайдено</option>
+        <option value="2">На лікуванні</option>
+        <option value="3">Здорова</option>
+        <option value="4">Готова до усиновлення</option>
+        <option value="5">Усиновлена</option>
+      </select>
+    </label>
+
+    <div class="btn-group">
+      <button class="green-btn sort-btn" (click)="toggleSortOrder()">
+        {{ sortOrder === 'desc' ? 'Найстаріші' : 'Найновіші' }} спершу
+      </button>
+
+      <button class="green-btn reset-btn" (click)="resetFilters()">
+        Скинути фільтри
+      </button>
+    </div>
+  </section>
+
+  <!-- Список тварин -->
   <p *ngIf="animals.length === 0" class="empty-message">
     Жодної тваринки не знайдено
   </p>

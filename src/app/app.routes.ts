@@ -14,7 +14,7 @@ import { DonationListComponent } from './donation/donation-list/donation-list.co
 import { DonationPaymentComponent } from './donation/donation-payment/donation-payment.component';
 import { HomeComponent } from './main/home/home.component';
 import { AboutComponent } from './main/about/about.component';
-
+import { GoogleCallbackComponent } from './auth/google-callback.component';
 
 export const routes: Routes = [
   { path: 'auth/login', component: LoginComponent },
@@ -26,12 +26,13 @@ export const routes: Routes = [
   { path: 'animal/user-profile', component: UserProfileComponent },
   { path: 'animal/animal-list', component: AnimalListComponent },
   { path: 'animal/volunteer-form', component: VolunteerFormComponent },
-  { path: 'animal/animal-notification', component: AnimalNotificationComponent },
+  { path: 'animal/animal-notification/:id', component: AnimalNotificationComponent },
   { path: 'donation/donation-list', component: DonationListComponent },
   { path: 'donation/donation-payment/:id', component: DonationPaymentComponent },
   { path: 'about', component: AboutComponent },
   { path: 'home', component: HomeComponent },
   { path: 'animal/:id', component: AnimalProfileComponent },
+  { path: 'auth/google/callback', loadComponent: () => import('./auth/google-callback.component').then(m => m.GoogleCallbackComponent) },
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   { path: '**', redirectTo: 'home' }
 ];

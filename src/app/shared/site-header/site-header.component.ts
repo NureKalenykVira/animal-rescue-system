@@ -9,17 +9,29 @@ import { RouterModule } from '@angular/router';
   styleUrl: './site-header.component.scss'
 })
 export class SiteHeaderComponent {
-  isAuthenticated = true;
+  isAuthenticated = false;
+  menuOpen = false;
 
   constructor() {
-    // тимчасова логіка:
     const token = localStorage.getItem('access_token');
-    this.isAuthenticated = !token;
+    this.isAuthenticated = !!token;
   }
 
-  menuOpen = false;
+  ngOnInit(): void {
+    window.addEventListener('storage', () => {
+      const token = localStorage.getItem('access_token');
+      this.isAuthenticated = !!token;
+    });
+  }
 
   toggleMenu(): void {
     this.menuOpen = !this.menuOpen;
   }
+
+  logout(): void {
+    localStorage.removeItem('access_token');
+    this.isAuthenticated = false;
+    window.location.reload();
+  }
 }
+

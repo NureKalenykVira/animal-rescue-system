@@ -9,15 +9,20 @@
     </div>
     <h2 class="section-title">Вет-клініки поруч:</h2>
     <div #map class="map-container"></div>
+    <div class="button-wrapper">
+      <button class="google-route-button" (click)="openInGoogleMaps()">
+        Відкрити в Google Maps
+      </button>
+    </div>
   </div>
 
   <ng-template #volunteerBlock>
   <div class="block2">
     <h1>Дякуємо за співпрацю!</h1>
     <p>
-      Щоб Ви мали змогу слідкувати за долею тваринки далі, вона буде додана до Вашого профілю
+      Щоб Ви мали змогу слідкувати за долею тваринки далі, вона буде додана до Вашого профілю, якщо ви зареєстрований.
     </p>
-    <button class="action-button" routerLink="/home">На головну сторінку</button>
+    <button class="action-button" (click)="goTo()">На головну сторінку</button>
   </div>
 </ng-template>
 </div>

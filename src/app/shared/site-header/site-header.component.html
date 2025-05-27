@@ -11,7 +11,7 @@
 
       <ng-container *ngIf="isAuthenticated; else guestLinks">
         <li><a routerLink="/animal/user-profile">Мій профіль</a></li>
-        <li><a routerLink="/auth/home">Вийти</a></li>
+        <li><a routerLink="/auth/home" (click)="logout()">Вийти</a></li>
       </ng-container>
 
       <ng-template #guestLinks>

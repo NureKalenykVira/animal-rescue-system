@@ -4,8 +4,11 @@
   <section class="profile-section profile-info-row">
     <div class="profile-photo-side">
       <div class="photo-wrapper">
-        <img [src]="user.photoUrl || 'assets/img/user-icon.png'" alt="Фото користувача" />
-        <button class="upload-btn">Завантажити/змінити фото</button>
+        <img [src]="photoPreview || user.photo?.url || 'assets/img/user-icon.png'" alt="Фото користувача" />
+        <label class="upload-btn">
+          Завантажити/змінити фото
+          <input type="file" accept="image/*" (change)="onPhotoSelected($event)" hidden />
+        </label>
       </div>
     </div>
 
@@ -14,13 +17,14 @@
 
       <label>
         Ім’я
-        <input type="text" formControlName="name" [disabled]="!isEditing" />
-        <span class="error" *ngIf="name.invalid && name.touched">Ім’я обов’язкове</span>
+        <input type="text" formControlName="first_name" [disabled]="!isEditing" />
+        <span class="error" *ngIf="first_name.invalid && first_name.touched">Ім’я обов’язкове</span>
       </label>
 
       <label>
-        Ім’я користувача
-        <input type="text" [value]="user.username" disabled />
+        Прізвище
+        <input type="text" formControlName="last_name" [disabled]="!isEditing" />
+        <span class="error" *ngIf="last_name.invalid && last_name.touched">Прізвище обов’язкове</span>
       </label>
 
       <label>
@@ -34,13 +38,24 @@
         <input type="text" [value]="role" disabled />
       </label>
 
+      <label *ngIf="role === 'volunteer' || role === 'vet'">
+        Telegram
+        <input type="text" formControlName="telegram_username" [disabled]="!isEditing" />
+      </label>
+
+      <label *ngIf="role === 'volunteer' || role === 'vet'">
+        Viber
+        <input type="text" formControlName="viber_phone" [disabled]="!isEditing" />
+      </label>
+
+      <label *ngIf="role === 'volunteer' || role === 'vet'">
+        WhatsApp
+        <input type="text" formControlName="whatsapp_phone" [disabled]="!isEditing" />
+      </label>
+
       <a class="doyouwannabe" [routerLink]="['/animal/volunteer-form']">Стати волонтером?</a>
 
-      <label>
-        Пароль
-        <input type="password" formControlName="password" [disabled]="!isEditing" />
-        <span class="error" *ngIf="password.invalid && password.touched">Мінімум 6 символів</span>
-      </label>
+      <button class="small-link" type="button" (click)="showPasswordChange = true">Змінити пароль</button>
 
       <div class="form-buttons">
         <button *ngIf="!isEditing" class="green" type="button" (click)="startEdit()">Змінити</button>
@@ -49,59 +64,62 @@
     </form>
 
     <div class="modal-overlay" *ngIf="showPasswordChange">
-  <div class="modal-content">
-    <h2>Підтвердіть зміну пароля</h2>
+      <div class="modal-content">
+        <h2>Підтвердіть зміну пароля</h2>
 
-    <label>Старий пароль
-      <input type="password" [(ngModel)]="oldPassword" />
-      <span class="error" *ngIf="passwordError === 'old'">Старий пароль невірний</span>
-    </label>
+        <label>Старий пароль
+          <input type="password" [(ngModel)]="oldPassword" />
+          <span class="error" *ngIf="passwordError === 'old'">Старий пароль невірний</span>
+        </label>
 
-    <label>Новий пароль
-      <input type="password" [(ngModel)]="newPassword" />
-      <span class="error" *ngIf="passwordError === 'short'">Пароль має містити щонайменше 6 символів</span>
-    </label>
+        <label>Новий пароль
+          <input type="password" [(ngModel)]="newPassword" />
+          <span class="error" *ngIf="passwordError === 'short'">Пароль має містити щонайменше 6 символів</span>
+        </label>
 
-    <label>Підтвердження нового
-      <input type="password" [(ngModel)]="confirmPassword" />
-      <span class="error" *ngIf="passwordError === 'mismatch'">Паролі не співпадають</span>
-    </label>
+        <label>Підтвердження нового
+          <input type="password" [(ngModel)]="confirmPassword" />
+          <span class="error" *ngIf="passwordError === 'mismatch'">Паролі не співпадають</span>
+        </label>
 
-    <div class="modal-buttons">
-      <button (click)="submitPasswordChange()">Підтвердити</button>
-      <button (click)="showPasswordChange = false">Скасувати</button>
+        <div class="modal-buttons">
+          <button class="cancel-btn" (click)="showPasswordChange = false">Скасувати</button>
+          <button class="confirm-btn" (click)="submitPasswordChange()">Підтвердити</button>
+        </div>
+      </div>
     </div>
-  </div>
-</div>
   </section>
 
-  <section *ngIf="role === 'volunteer' || role === 'vet'" class="notifications-section">
-  <h2>Повідомлення:</h2>
+  <section *ngIf="messages.length > 0" class="notifications-section">
+    <h2>Повідомлення:</h2>
 
   <div *ngFor="let msg of messages" class="notification-card">
-    <div class="msg-body" (click)="openAnimalForm(msg)" [routerLink]="['/animal/animal-notification']">
-      <div class="msg-title">{{ msg.title }}</div>
-      <div class="msg-date">{{ msg.date }}</div>
+    <div class="msg-body" (click)="openAnimalForm(msg)">
+        <div class="msg-title">
+          {{ msg.type === 'new' ? 'Знайдено нову тварину – ' + msg.animal.name : 'Оновлення ' + msg.animal.name }}
+        </div>
+        <div class="msg-date">{{ msg.created_at | date:'short' }}</div>
     </div>
-    <div class="msg-actions">
+
+    <div class="msg-actions" *ngIf="msg.type === 'new'">
       <button class="accept-btn" (click)="acceptAnimal(msg)">Прийняти</button>
       <button class="reject-btn" (click)="rejectMessage(msg)">Відхилити</button>
     </div>
   </div>
-</section>
+  </section>
 
   <section class="animals-section">
-  <h2>Ваші тварини:</h2>
-  <div *ngIf="animals.length === 0" class="no-animals-text">
-    Підписуйся, щоб стежити за тваринками 🙂
-  </div>
-  <div class="animal-grid">
-    <a class="animal-card" *ngFor="let animal of animals" [routerLink]="['/animals', animal.id]">
-      <img [src]="animal.image || 'assets/img/animal-default.jpg'" alt="Фото тварини" />
-      <div class="animal-name">{{ animal.name }}</div>
-    </a>
-  </div>
-</section>
+    <h2>Ваші тварини:</h2>
+    <div *ngIf="animals.length === 0" class="no-animals-text">
+      Підписуйся, щоб стежити за тваринками
+    </div>
+    <div class="animal-grid">
+      <a [routerLink]="['/animal', animal.id]" class="animal-card" *ngFor="let animal of animals">
+        <img [src]="animal.image || 'assets/img/animal-default.jpg'" alt="Фото тварини" />
+        <div class="animal-name">{{ animal.name }}</div>
+      </a>
+    </div>
+  </section>
 </main>
 
 <app-site-footer></app-site-footer>

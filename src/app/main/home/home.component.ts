@@ -3,6 +3,7 @@ import { RouterModule } from '@angular/router';
 import { CommonModule, NgFor } from '@angular/common';
 import { SiteHeaderComponent } from '../../shared/site-header/site-header.component';
 import { SiteFooterComponent } from '../../shared/site-footer/site-footer.component';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 
 declare const google: any;
 
@@ -25,14 +26,36 @@ export class HomeComponent implements OnInit, AfterViewInit {
   @ViewChild('map', { static: false }) mapElement!: ElementRef;
   map!: google.maps.Map;
 
+  constructor(private http: HttpClient) {}
+
   ngOnInit(): void {
-    // Прикладові дані (надалі буде з бекенду)
-    this.adoptedAnimals = Array.from({ length: 5 }, (_, i) => ({
-      id: i + 1,
-      name: `Тварина ${i + 1}`,
-      photoUrl: 'assets/img/animal-default.jpg',
-      status: 'усиновлений'
-    }));
+    const params = new HttpParams()
+      .set('status', '5')
+      .set('page', '1')
+      .set('page_size', '5')
+      .set('order_by', 'updated_at')
+      .set('order', 'desc');
+
+    const token = localStorage.getItem('access_token');
+    const headers = token
+      ? new HttpHeaders({
+          'x-token': token
+      })
+      : undefined;
+
+    this.http.get<any>('https://kkp-api.ruslan.page/api/animals', { params, headers }).subscribe({
+      next: (res) => {
+        this.adoptedAnimals = res.result.map((animal: any) => ({
+          id: animal.id,
+          name: animal.name,
+          photoUrl: animal.media?.result?.[0]?.url || 'assets/img/animal-default.jpg',
+          status: 'усиновлений'
+        }));
+      },
+      error: (err) => {
+        console.error('Помилка отримання усиновлених тварин:', err);
+      }
+    });
   }
 
   ngAfterViewInit(): void {

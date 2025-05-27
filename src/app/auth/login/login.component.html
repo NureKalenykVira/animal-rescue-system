@@ -38,10 +38,12 @@
         </div>
       </div>
 
-      <a class="forgot-password" href="#">Забули пароль?</a>
+      <div class="error login-error" *ngIf="loginError">{{ loginError }}</div>
+
+      <a class="forgot-password" (click)="showForgotModal = true">Забули пароль?</a>
 
       <p class="alt-text">Або увійти за допомогою:</p>
-      <button class="google-login" type="button">
+      <button class="google-login" type="button" (click)="loginWithGoogle()">
         <img src="assets/img/google-icon.png" alt="Google" />
       </button>
 
@@ -51,5 +53,38 @@
 
   <div class="login-image">
     <img src="assets/img/squirrel.jpg" alt="Білка" />
+  </div>
+</div>
+
+<div class="modal-overlay" *ngIf="showForgotModal">
+  <div class="modal-content">
+    <h2>Скидання пароля</h2>
+    <label>Email:
+      <input [(ngModel)]="resetEmail" type="email" />
+    </label>
+    <div class="modal-buttons">
+      <button (click)="showForgotModal = false">Скасувати</button>
+      <button (click)="requestReset()">Надіслати лист</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" *ngIf="showResetModal">
+  <div class="modal-content">
+    <h2>Новий пароль</h2>
+    <label>Токен:
+      <input [(ngModel)]="resetToken" />
+    </label>
+    <label>Новий пароль:
+      <input [(ngModel)]="newPassword" type="password" />
+    </label>
+    <label>Підтвердження:
+      <input [(ngModel)]="confirmPassword" type="password" />
+    </label>
+    <div class="error" *ngIf="resetError">{{ resetError }}</div>
+    <div class="modal-buttons">
+      <button (click)="submitNewPassword()">Змінити</button>
+      <button (click)="showResetModal = false">Скасувати</button>
+    </div>
   </div>
 </div>

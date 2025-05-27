@@ -53,12 +53,16 @@
   }
 
   .animal-grid {
+    display: flex;
     padding: 2rem;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    flex-wrap: wrap;
+    justify-content: center;
     gap: 2rem;
 
     .animal-card {
+      flex: 1 1 260px;
+      max-width: 300px;
+      min-width: 240px;
       background: #f9f9f9;
       border-radius: 12px;
       overflow: hidden;
@@ -179,4 +183,60 @@
   font-size: 2rem;
   color: #444;
   margin-top: 2rem;
+}
+
+.filter-controls {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 1.5rem;
+  margin: 2rem auto;
+  padding: 0 1rem;
+
+  .filter-group {
+    font-size: 1rem;
+
+    select {
+      margin-left: 0.5rem;
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      width: 220px;
+    }
+  }
+
+  .btn-group {
+    display: flex;
+    gap: 1rem;
+
+    button {
+      min-width: 200px;
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    .sort-btn {
+      background-color: #e0e0e0;
+      color: #000;
+
+      &:hover {
+        background-color: #d0d0d0;
+      }
+    }
+
+    .reset-btn {
+      background-color: #006c59;
+      color: white;
+
+      &:hover {
+        background-color: #005046;
+      }
+    }
+  }
 }
