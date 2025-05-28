@@ -1,0 +1,172 @@
+<section class="admin-section">
+  <h2  *ngIf="!isLocalAdmin">Ветеринарні клініки</h2>
+  <h2 *ngIf="isLocalAdmin">Моя клініка</h2>
+
+  <!-- Панель фільтрів -->
+  <section class="filter-controls" *ngIf="!isLocalAdmin">
+    <div class="filter-fields">
+      <label>
+        ID:
+        <input type="number" [(ngModel)]="filters.id" (change)="applyFilters()" />
+      </label>
+
+      <label>
+        ID адміністратора:
+        <input type="number" [(ngModel)]="filters.adminId" (change)="applyFilters()" />
+      </label>
+
+      <label>
+        Сортувати за:
+        <select [(ngModel)]="filters.orderBy" (change)="applyFilters()">
+          <option value="id">ID</option>
+          <option value="name">Назва</option>
+        </select>
+      </label>
+
+      <label>
+        Напрямок:
+        <select [(ngModel)]="filters.order" (change)="applyFilters()">
+          <option value="asc">Зростанням</option>
+          <option value="desc">Спаданням</option>
+        </select>
+      </label>
+    </div>
+
+    <button class="green-btn" (click)="resetFilters()">Скинути фільтри</button>
+  </section>
+
+  <!-- Таблиця клінік -->
+  <table class="admin-table" *ngIf="clinics.length > 0">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Назва</th>
+        <th>Локація</th>
+        <th>Адміністратор</th>
+        <th>Контакти</th>
+        <th>Працівники</th>
+        <th>Дії</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let c of clinics">
+        <td>{{ c.id }}</td>
+        <td><input [(ngModel)]="c.name" /></td>
+        <td class="location-cell" [title]="c.displayAddress">{{ c.displayAddress }}</td>
+        <td>
+          <div class="admin-info" *ngIf="isLocalAdmin">
+            <img *ngIf="c.admin?.photo?.url" [src]="c.admin.photo.url" alt="Фото" />
+            <span>{{ c.admin?.first_name }} {{ c.admin?.last_name }}</span>
+          </div>
+          <div class="admin-info" *ngIf="!isLocalAdmin">
+            <select [(ngModel)]="c.admin_id">
+              <option *ngFor="let u of localAdmins" [value]="u.id">
+                {{ u.first_name }} {{ u.last_name }} (ID: {{ u.id }})
+              </option>
+            </select>
+          </div>
+        </td>
+        <td>
+          <div class="contacts">
+            <div *ngIf="c.admin?.telegram_username">Telegram: {{ c.admin.telegram_username }}</div>
+            <div *ngIf="c.admin?.viber_phone">Viber: {{ c.admin.viber_phone }}</div>
+            <div *ngIf="c.admin?.whatsapp_phone">WhatsApp: {{ c.admin.whatsapp_phone }}</div>
+          </div>
+        </td>
+        <td>
+          {{ c.employees_count }}
+          <button class="icon-button" (click)="openEmployeesModal(c)">👥</button>
+        </td>
+        <td class="actions-cell">
+          <button class="btn-save" (click)="saveClinic(c)">💾</button>
+          <button *ngIf="!isLocalAdmin" class="btn-delete" (click)="openDeleteModal(c)">🗑</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p *ngIf="clinics.length === 0">Клінік не знайдено.</p>
+  <button *ngIf="!isLocalAdmin" class="floating-add-btn" (click)="openAddModal()" title="Додати клініку">+</button>
+</section>
+
+<!-- Модальне підтвердження видалення -->
+<div class="modal-overlay" *ngIf="clinicToDelete">
+  <div class="modal">
+    <h3>Підтвердити видалення</h3>
+    <p>Ви справді хочете видалити клініку "{{ clinicToDelete.name }}"?</p>
+    <div class="modal-buttons">
+      <button (click)="confirmDelete()">Так, видалити</button>
+      <button (click)="cancelDelete()">Скасувати</button>
+    </div>
+  </div>
+</div>
+
+<!-- Модальне вікно додавання клініки -->
+<div class="modal-overlay" *ngIf="isAddModalOpen">
+  <div class="modal large">
+    <h3>Додати ветеринарну клініку</h3>
+
+    <label>Назва:</label>
+    <input [(ngModel)]="newClinic.name" />
+
+    <label>ID адміністратора:</label>
+    <input type="number" [(ngModel)]="newClinic.admin_id" />
+
+    <div class="map-container">
+      <div #addClinicMap class="map" style="height: 300px;"></div>
+    </div>
+    <p *ngIf="newClinic.address">Обрана адреса: {{ newClinic.address }}</p>
+
+    <div class="modal-buttons">
+      <button (click)="createClinic()">Додати</button>
+      <button (click)="cancelAdd()">Скасувати</button>
+    </div>
+  </div>
+</div>
+
+<!-- Модальне вікно працівників клініки -->
+<div class="modal-overlay" *ngIf="isEmployeesModalOpen">
+  <div class="modal large">
+    <h3>Працівники клініки #{{ selectedClinic?.id }}</h3>
+
+    <div *ngIf="selectedEmployees.length > 0; else emptyBlock">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Ім’я</th>
+            <th>Контакти</th>
+            <th>Дії</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let e of selectedEmployees">
+            <td>{{ e.id }}</td>
+            <td>{{ e.first_name }} {{ e.last_name }}</td>
+            <td>
+              <div *ngIf="e.telegram_username">Telegram: {{ e.telegram_username }}</div>
+              <div *ngIf="e.viber_phone">Viber: {{ e.viber_phone }}</div>
+              <div *ngIf="e.whatsapp_phone">WhatsApp: {{ e.whatsapp_phone }}</div>
+            </td>
+            <td class="actions-cell">
+              <button (click)="removeEmployee(e.id)">🗑</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <ng-template #emptyBlock>
+      <p>Немає працівників.</p>
+    </ng-template>
+
+    <div class="add-employee-form">
+      <label>Email нового працівника:</label>
+      <input [(ngModel)]="newEmployeeEmail" type="email" />
+      <button (click)="addEmployee()">Додати</button>
+    </div>
+
+    <div class="modal-buttons">
+      <button (click)="closeEmployeesModal()">Закрити</button>
+    </div>
+  </div>
+</div>

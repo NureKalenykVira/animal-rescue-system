@@ -147,3 +147,13 @@
     </div>
   </div>
 </div>
+
+<div class="modal-overlay2" *ngIf="isModalVisible">
+  <div class="modal2">
+    <p>{{ modalMessage }}</p>
+    <div class="modal-buttons2">
+      <button (click)="closeModal()">OK</button>
+    </div>
+  </div>
+</div>
+

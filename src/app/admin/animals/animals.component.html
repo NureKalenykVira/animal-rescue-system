@@ -1,0 +1,108 @@
+<section class="admin-section">
+  <h2>Тварини</h2>
+
+  <!-- Панель фільтрів -->
+  <section class="filter-controls">
+    <label>
+      ID:
+      <input type="number" [(ngModel)]="filters.id" (change)="applyFilters()" />
+    </label>
+
+    <label>
+      Статус:
+      <select [(ngModel)]="filters.status" (change)="applyFilters()">
+        <option value="">Усі</option>
+        <option [value]="0">Новий</option>
+        <option [value]="1">На перевірці</option>
+        <option [value]="2">Прийнятий</option>
+        <option [value]="3">На лікуванні</option>
+        <option [value]="4">Усиновлений</option>
+        <option [value]="5">Випущений</option>
+      </select>
+    </label>
+
+    <label>
+      Сортувати за:
+      <select [(ngModel)]="filters.orderBy" (change)="applyFilters()">
+        <option value="id">ID</option>
+        <option value="name">Ім’я</option>
+        <option value="breed">Порода</option>
+      </select>
+    </label>
+
+    <label>
+      Напрямок:
+      <select [(ngModel)]="filters.order" (change)="applyFilters()">
+        <option value="asc">Зростанням</option>
+        <option value="desc">Спаданням</option>
+      </select>
+    </label>
+
+    <button class="green-btn" (click)="resetFilters()">Скинути фільтри</button>
+  </section>
+
+  <!-- Таблиця тварин -->
+  <table class="admin-table" *ngIf="animals.length > 0">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Фото</th>
+        <th>Ім’я</th>
+        <th>Порода</th>
+        <th>Статус</th>
+        <th>Стать</th>
+        <th>Опис</th>
+        <th>Локація</th>
+        <th>Оновлено</th>
+        <th>Дії</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let a of animals">
+        <td>{{ a.id }}</td>
+        <td>
+          <img *ngIf="a.media?.result?.length" [src]="a.media.result[0].url" alt="Фото" width="60" />
+        </td>
+        <td><input [(ngModel)]="a.name" /></td>
+        <td><input [(ngModel)]="a.breed" /></td>
+        <td>
+          <select [(ngModel)]="a.status">
+            <option [value]="0">Новий</option>
+            <option [value]="1">На перевірці</option>
+            <option [value]="2">Прийнятий</option>
+            <option [value]="3">На лікуванні</option>
+            <option [value]="4">Усиновлений</option>
+            <option [value]="5">Випущений</option>
+          </select>
+        </td>
+        <td>
+          <select [(ngModel)]="a.gender">
+            <option [value]="0">Самець</option>
+            <option [value]="1">Самка</option>
+          </select>
+        </td>
+        <td><input [(ngModel)]="a.description" /></td>
+        <td>{{ a.current_location?.name }}</td>
+        <td>{{ a.updated_at * 1000 | date: 'short' }}</td>
+        <td class="actions-cell">
+          <button class="btn-save" (click)="saveAnimal(a)">💾</button>
+          <button class="btn-delete" (click)="openDeleteModal(a)">🗑</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p *ngIf="animals.length === 0">Тварин не знайдено.</p>
+</section>
+
+<!-- Модальне підтвердження видалення -->
+<div class="modal-overlay" *ngIf="animalToDelete">
+  <div class="modal">
+    <h3>Підтвердити видалення</h3>
+    <p>Ви справді хочете видалити тварину {{ animalToDelete.name }}?</p>
+    <div class="modal-buttons">
+      <button (click)="confirmDelete()">Так, видалити</button>
+      <button (click)="cancelDelete()">Скасувати</button>
+    </div>
+  </div>
+</div>

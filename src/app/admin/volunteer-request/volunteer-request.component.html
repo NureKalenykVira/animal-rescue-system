@@ -1,0 +1,36 @@
+<h2>Заявки волонтерів</h2>
+<table>
+  <tr>
+    <th>ID</th>
+    <th>Ім’я</th>
+    <th>Місто</th>
+    <th>Дата</th>
+  </tr>
+  <tr *ngFor="let r of requests" (click)="openRequest(r)">
+    <td>{{ r.id }}</td>
+    <td>{{ r.full_name }}</td>
+    <td>{{ r.city }}</td>
+    <td>{{ r.created_at * 1000 | date: 'short' }}</td>
+  </tr>
+</table>
+
+<div class="modal-overlay" *ngIf="isModalOpen">
+  <div class="modal-content">
+    <h3>Заявка #{{ selectedRequest?.id }}</h3>
+    <p><b>Ім’я:</b> {{ selectedRequest?.full_name }}</p>
+    <p><b>Місто:</b> {{ selectedRequest?.city }}</p>
+    <p><b>Телефон:</b> {{ selectedRequest?.phone_number }}</p>
+    <p><b>Допомога:</b> {{ getHelpDescription(selectedRequest.help) }}</p>
+    <p><b>Наявність транспорту:</b> {{ selectedRequest?.has_vehicle ? 'Так' : 'Ні' }}</p>
+    <p><b>Коментар користувача:</b> {{ selectedRequest?.text }}</p>
+
+    <label>Коментар адміністратора:</label>
+    <textarea [(ngModel)]="commentText" rows="3"></textarea>
+
+    <div class="modal-buttons">
+      <button class="approve" (click)="approveRequest()">Прийняти</button>
+      <button class="reject" (click)="rejectRequest()">Відхилити</button>
+      <button class="cancel" (click)="closeModal()">Скасувати</button>
+    </div>
+  </div>
+</div>

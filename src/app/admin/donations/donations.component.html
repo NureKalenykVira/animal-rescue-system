@@ -1,0 +1,87 @@
+<section class="admin-section">
+  <h2>Збори</h2>
+
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Назва</th>
+        <th>Опис</th>
+        <th>Потрібно</th>
+        <th>Зібрано</th>
+        <th>Створено</th>
+        <th>Завершено</th>
+        <th>Донати</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let g of goals">
+        <td>{{ g.id }}</td>
+        <td>{{ g.name }}</td>
+        <td>{{ g.description }}</td>
+        <td>{{ g.need_amount }} грн</td>
+        <td>{{ g.got_amount }} грн</td>
+        <td>{{ g.created_at }}</td>
+        <td>{{ g.ended_at || '—' }}</td>
+        <td>  <button class="icon-button" (click)="viewDonations(g)">🔍</button>  </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p *ngIf="goals.length === 0">Зборів знайдено.</p>
+
+  <button class="floating-add-btn" (click)="openAddModal()" title="Додати ціль">+</button>
+</section>
+
+<div class="modal-overlay" *ngIf="isAddModalOpen">
+  <div class="modal">
+    <h3>Додати новий збір</h3>
+
+    <label>Назва:</label>
+    <input [(ngModel)]="newGoal.name" />
+
+    <label>Опис:</label>
+    <textarea [(ngModel)]="newGoal.description"></textarea>
+
+    <label>Потрібна сума (грн):</label>
+    <input type="number" [(ngModel)]="newGoal.need_amount" />
+
+    <div class="modal-buttons">
+      <button (click)="createGoal()">Додати</button>
+      <button (click)="cancelAdd()">Скасувати</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" *ngIf="isDonationsModalOpen">
+  <div class="modal large">
+    <h3>Донати: "{{ selectedGoalName }}"</h3>
+
+    <table class="admin-table" *ngIf="selectedGoalDonations.length > 0">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Користувач</th>
+          <th>Сума</th>
+          <th>Дата</th>
+          <th>Коментар</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let d of selectedGoalDonations">
+          <td>{{ d.id }}</td>
+          <td>{{ d.user?.first_name }} {{ d.user?.last_name }}</td>
+          <td>{{ d.amount }} грн</td>
+          <td>{{ d.date }}</td>
+          <td>{{ d.comment || '—' }}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p *ngIf="selectedGoalDonations.length === 0">Донатів до цього збору ще не надходило.</p>
+
+    <div class="modal-buttons">
+      <button (click)="closeDonationsModal()">Закрити</button>
+    </div>
+  </div>
+</div>

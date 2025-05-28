@@ -84,8 +84,8 @@ export class UserProfileComponent implements OnInit {
 
   getRoleFromCode(roleCode: number): 'user' | 'volunteer' | 'vet' {
     if (roleCode === 0) return 'user';
-    if (roleCode === 10) return 'volunteer';
-    if (roleCode === 11) return 'vet';
+    if (roleCode === 11) return 'volunteer';
+    if (roleCode === 10) return 'vet';
     return 'user';
   }
 

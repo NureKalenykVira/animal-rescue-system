@@ -1,12 +1,6 @@
 /// <reference types="@types/google.maps" />
 
-import {
-  AfterViewInit,
-  Component,
-  ElementRef,
-  ViewChild,
-  OnInit
-} from '@angular/core';
+import { AfterViewInit, Component, ElementRef, ViewChild, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgIf } from '@angular/common';
 
@@ -20,6 +14,8 @@ import { NgIf } from '@angular/common';
 export class ThankYouComponent implements OnInit, AfterViewInit {
   method: string | null = null;
   selectedClinicCoords: google.maps.LatLngLiteral | null = null;
+  modalMessage: string | null = null;
+  isModalVisible = false;
 
   @ViewChild('map', { static: false }) mapElement!: ElementRef;
   map!: google.maps.Map;
@@ -193,7 +189,7 @@ export class ThankYouComponent implements OnInit, AfterViewInit {
           this.directionsRenderer.setDirections(response);
           this.selectedClinicCoords = destination;
         } else {
-          alert('Не вдалося побудувати маршрут');
+          this.showModal('Не вдалося побудувати маршрут');
         }
       }
     );
@@ -207,5 +203,15 @@ export class ThankYouComponent implements OnInit, AfterViewInit {
 
   goTo(): void {
     this.router.navigate(['/home']);
+  }
+
+  showModal(message: string): void {
+    this.modalMessage = message;
+    this.isModalVisible = true;
+  }
+
+  closeModal(): void {
+    this.isModalVisible = false;
+    this.modalMessage = null;
   }
 }

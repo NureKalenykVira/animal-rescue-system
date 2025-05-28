@@ -1,0 +1,92 @@
+<section class="admin-section">
+  <h2>Звіти про тварин</h2>
+
+  <div class="filter-controls">
+    <div class="filter-fields">
+      <label>
+        ID:
+        <input [(ngModel)]="filters.id" (change)="applyFilters()"/>
+      </label>
+      <label>
+        ID тварини:
+        <input [(ngModel)]="filters.animalId" (change)="applyFilters()"/>
+      </label>
+      <label>
+        ID автора:
+        <input [(ngModel)]="filters.reportedById" (change)="applyFilters()"/>
+      </label>
+      <label>
+        ID виконавця:
+        <input [(ngModel)]="filters.assignedToId" (change)="applyFilters()"/>
+      </label>
+      <label>
+        Сортувати за:
+        <select [(ngModel)]="filters.orderBy" (change)="applyFilters()">
+          <option value="id">ID</option>
+          <option value="created_at">Створення</option>
+        </select>
+      </label>
+      <label>
+        Напрямок:
+        <select [(ngModel)]="filters.order" (change)="applyFilters()">
+          <option value="asc">Зростанням</option>
+          <option value="desc">Спаданням</option>
+        </select>
+      </label>
+    </div>
+    <button class="green-btn" (click)="resetFilters()">Скинути фільтри</button>
+  </div>
+
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Фото</th>
+        <th>Тварина</th>
+        <th>Локація</th>
+        <th>Автор</th>
+        <th>Призначено</th>
+        <th>Примітка</th>
+        <th>Створено</th>
+        <th>Дії</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let r of reports">
+        <td>{{ r.id }}</td>
+        <td>
+          <img *ngIf="r.animal?.media?.result?.[0]?.url" [src]="r.animal.media.result[0].url" alt="" />
+        </td>
+        <td>{{ r.animal?.name }}</td>
+        <td>{{ r.location?.name || r.animal?.current_location?.name }}</td>
+        <td>{{ getFullName(r.reported_by) }}</td>
+        <td>
+          <select [(ngModel)]="r.assigned_to" [ngModelOptions]="{standalone: true}">
+            <option [ngValue]="null">Не призначено</option>
+            <option *ngFor="let v of volunteers" [ngValue]="v">
+              {{ v.first_name }} {{ v.last_name }}
+            </option>
+          </select>
+        </td>
+        <td>
+          <input [(ngModel)]="r.notes" placeholder="Примітка" />
+        </td>
+        <td>{{ r.created_at * 1000 | date:'short' }}</td>
+        <td class="actions-cell">
+          <button class="btn-save" (click)="saveReport(r)">💾</button>
+          <button class="btn-delete" (click)="openDeleteModal(r)">🗑</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="modal-overlay" *ngIf="reportToDelete">
+    <div class="modal">
+      <h3>Видалити звіт #{{ reportToDelete.id }}?</h3>
+      <div class="modal-buttons">
+        <button (click)="confirmDelete()">Видалити</button>
+        <button (click)="cancelDelete()">Скасувати</button>
+      </div>
+    </div>
+  </div>
+</section>

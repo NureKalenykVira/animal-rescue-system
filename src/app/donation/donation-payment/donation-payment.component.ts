@@ -4,7 +4,7 @@ import { Component, AfterViewInit, ElementRef, ViewChild, OnInit } from '@angula
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
-import { DonationService, Donation } from '../../services/donation.service';
+import { DonationService, Goal } from '../../services/donation.service';
 import { HttpClient } from '@angular/common/http';
 
 declare const google: any;
@@ -25,8 +25,11 @@ export class DonationPaymentComponent implements OnInit, AfterViewInit {
   @ViewChild('addressInput') addressInput!: ElementRef;
 
   showDialog = false;
-  donationId!: number;
-  donation!: Donation;
+  goal!: Goal;
+  goalId!: number;
+  createdDonationId!: number;
+  modalMessage: string | null = null;
+  isModalVisible = false;
 
   donationForm: FormGroup;
 
@@ -52,15 +55,14 @@ export class DonationPaymentComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     const idParam = this.route.snapshot.paramMap.get('id');
     if (idParam) {
-      this.donationId = +idParam;
-      this.donationService.getDonationById(this.donationId).subscribe(data => {
-        this.donation = data;
+      this.goalId = +idParam;
+      this.donationService.getDonationById(this.goalId).subscribe(data => {
+        this.goal = data;
       });
     }
   }
 
   ngAfterViewInit(): void {
-    // Google Maps Autocomplete
     const input = document.getElementById('autocomplete') as HTMLInputElement;
     const autocomplete = new google.maps.places.Autocomplete(input, {
       types: ['geocode'],
@@ -73,7 +75,6 @@ export class DonationPaymentComponent implements OnInit, AfterViewInit {
       this.donationForm.get('address')?.setValue(fullAddress);
     });
 
-    // PayPal Smart Button
     const paypalContainer = document.getElementById('paypal-button-container');
     if (paypalContainer) {
       paypal.Buttons({
@@ -87,36 +88,43 @@ export class DonationPaymentComponent implements OnInit, AfterViewInit {
         funding: {
           disallow: [paypal.FUNDING.CARD]
         },
-        createOrder: (data: any, actions: any) => {
-          return actions.order.create({
-            purchase_units: [{
-              amount: {
-                value: (this.donationForm.get('amount')?.value || 1).toFixed(2),
-                currency_code: 'USD'
-              },
-              description: this.donation?.name || 'Благодійний донат'
-            }]
-          });
+        createOrder: () => {
+          return fetch(`https://kkp-api.ruslan.page/api/donations/${this.goalId}/donate`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'x-token': localStorage.getItem('access_token') || ''
+            },
+            body: JSON.stringify(this.donationForm.value)
+          })
+            .then(res => res.json())
+            .then(data => {
+              this.createdDonationId = data.id;
+              return data.paypal_id;
+            });
         },
         onApprove: (data: any, actions: any) => {
           return actions.order.capture().then((details: any) => {
-            console.log('Оплата успішна. Донат:', details);
-
-            this.showDialog = true;
-
-            const payload = {
-              ...this.donationForm.value,
-              paypalOrderId: data.orderID,
-              email: details.payer.email_address,
-              name: details.payer.name?.given_name
-            };
-
-            this.http.post(`https://kkp-api.ruslan.page/api/donations/${this.donationId}/donate`, payload).subscribe();
+            this.http.post(
+              `https://kkp-api.ruslan.page/api/donations/${this.goalId}/donations/${this.createdDonationId}`,
+              {
+                paypalOrderId: data.orderID,
+                email: details.payer.email_address,
+                name: details.payer.name?.given_name
+              }
+            ).subscribe({
+              next: () => {
+                this.showDialog = true;
+              },
+              error: (err) => {
+                console.error('Обробка платежу не вдалася:', err);
+              }
+            });
           });
         },
         onError: (err: any) => {
           console.error('Помилка PayPal:', err);
-          alert('Помилка при оплаті через PayPal');
+          this.showModal('Помилка при оплаті через PayPal');
         }
       }).render('#paypal-button-container');
     }
@@ -128,11 +136,16 @@ export class DonationPaymentComponent implements OnInit, AfterViewInit {
         ...this.donationForm.value
       };
 
-      this.http.post(`https://kkp-api.ruslan.page/api/donations/${this.donationId}/donate`, payload).subscribe({
-        next: () => this.showDialog = true,
+      this.http.post<any>(
+        `https://kkp-api.ruslan.page/api/donations/${this.goalId}/donate`,
+        payload
+      ).subscribe({
+        next: () => {
+          this.showDialog = true;
+        },
         error: err => {
-          console.error('Donation failed:', err);
-          alert('Помилка при надсиланні донату. Спробуйте ще раз.');
+          console.error('Помилка створення донату (форма):', err);
+          this.showModal('Помилка при надсиланні донату. Спробуйте ще раз.');
         }
       });
     } else {
@@ -146,5 +159,15 @@ export class DonationPaymentComponent implements OnInit, AfterViewInit {
 
   goBack(): void {
     this.router.navigate(['/donation/donation-list']);
+  }
+
+  showModal(message: string): void {
+    this.modalMessage = message;
+    this.isModalVisible = true;
+  }
+
+  closeModal(): void {
+    this.isModalVisible = false;
+    this.modalMessage = null;
   }
 }

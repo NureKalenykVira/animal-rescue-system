@@ -1,0 +1,69 @@
+<section class="admin-section">
+  <h2>Лікування</h2>
+
+  <div class="filter-controls">
+    <div class="filter-fields">
+      <label>
+        ID:
+        <input [(ngModel)]="filters.id" (change)="applyFilters()" />
+      </label>
+      <label>
+        ID тварини:
+        <input [(ngModel)]="filters.animalId" (change)="applyFilters()" />
+      </label>
+      <label>
+        Сортувати за:
+        <select [(ngModel)]="filters.orderBy" (change)="applyFilters()">
+          <option value="id">ID</option>
+          <option value="created_at">Створено</option>
+          <option value="money_spent">Витрати</option>
+        </select>
+      </label>
+      <label>
+        Напрямок:
+        <select [(ngModel)]="filters.order" (change)="applyFilters()">
+          <option value="asc">Зростанням</option>
+          <option value="desc">Спаданням</option>
+        </select>
+      </label>
+    </div>
+    <button class="green-btn" (click)="resetFilters()">Скинути фільтри</button>
+  </div>
+
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Тварина</th>
+        <th>Опис</th>
+        <th>Клініка</th>
+        <th>Витрати</th>
+        <th>Дата</th>
+        <th>Дії</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let t of treatments">
+        <td>{{ t.id }}</td>
+        <td>{{ t?.animal_report?.animal?.name || t?.animal_report?.animal?.id || '—' }}</td>
+        <td>{{ t.description }}</td>
+        <td>{{ t.vet_clinic?.name || '—' }}</td>
+        <td>{{ t.money_spent }} грн</td>
+        <td>{{ t.created_at }}</td>
+        <td class="actions-cell">
+          <button class="btn-delete" (click)="openDeleteModal(t)">🗑</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="modal-overlay" *ngIf="treatmentToDelete">
+    <div class="modal">
+      <h3>Видалити лікування #{{ treatmentToDelete.id }}?</h3>
+      <div class="modal-buttons">
+        <button (click)="confirmDelete()">Видалити</button>
+        <button (click)="cancelDelete()">Скасувати</button>
+      </div>
+    </div>
+  </div>
+</section>

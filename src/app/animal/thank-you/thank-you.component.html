@@ -26,3 +26,13 @@
   </div>
 </ng-template>
 </div>
+
+<div class="modal-overlay" *ngIf="isModalVisible">
+  <div class="modal">
+    <p>{{ modalMessage }}</p>
+    <div class="modal-buttons">
+      <button (click)="closeModal()">OK</button>
+    </div>
+  </div>
+</div>
+

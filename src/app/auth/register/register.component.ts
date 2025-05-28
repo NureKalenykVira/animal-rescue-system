@@ -13,6 +13,8 @@ import { AuthService } from '../../services/auth.service';
 })
 export class RegisterComponent {
   registerForm: FormGroup;
+  modalMessage: string | null = null;
+  isModalVisible = false;
 
   constructor(
     private fb: FormBuilder,
@@ -41,7 +43,7 @@ export class RegisterComponent {
 
     this.authService.register(payload).subscribe({
       next: () => this.router.navigate(['/auth/login']),
-      error: (err: any) => alert('Помилка реєстрації: ' + (err.error?.detail || 'Невірні дані'))
+      error: (err: any) => this.showModal('Помилка реєстрації: ' + (err.error?.detail || 'Невірні дані'))
     });
   } else {
     this.registerForm.markAllAsTouched();
@@ -53,11 +55,21 @@ loginWithGoogle(): void {
     next: (res) => {
       window.location.href = res.url;
     },
-    error: () => alert('Не вдалося отримати Google URL')
+    error: () => this.showModal('Не вдалося отримати Google URL')
   });
 }
 
   goBack(): void {
     this.router.navigate(['/home']);
+  }
+
+  showModal(message: string): void {
+    this.modalMessage = message;
+    this.isModalVisible = true;
+  }
+
+  closeModal(): void {
+    this.isModalVisible = false;
+    this.modalMessage = null;
   }
 }

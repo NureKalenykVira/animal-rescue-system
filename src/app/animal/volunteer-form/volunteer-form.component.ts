@@ -16,6 +16,8 @@ declare const google: any;
 export class VolunteerFormComponent {
   volunteerForm: FormGroup;
   showDialog = false;
+  modalMessage: string | null = null;
+  isModalVisible = false;
 
   constructor(private fb: FormBuilder, private router: Router) {
     this.volunteerForm = this.fb.group({
@@ -102,7 +104,7 @@ export class VolunteerFormComponent {
         })
         .catch(err => {
           console.error('Помилка відправки анкети:', err);
-          alert('Не вдалося надіслати анкету. Спробуйте пізніше.');
+          this.showModal('Не вдалося надіслати анкету. Спробуйте пізніше.');
         });
 
     } else {
@@ -126,5 +128,15 @@ export class VolunteerFormComponent {
       const cityName = place.name;
       this.volunteerForm.get('location')?.setValue(cityName);
     });
+  }
+
+  showModal(message: string): void {
+    this.modalMessage = message;
+    this.isModalVisible = true;
+  }
+
+  closeModal(): void {
+    this.isModalVisible = false;
+    this.modalMessage = null;
   }
 }

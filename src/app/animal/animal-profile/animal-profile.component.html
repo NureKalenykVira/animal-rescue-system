@@ -22,7 +22,7 @@
             <option value="Невідомо">Невідомо</option>
           </select>
 
-          <label>Дата знаходження</label>
+          <label>Востаннє оновлено:</label>
           <input [value]="animal.foundDate" disabled />
 
           <label>Місце знаходження</label>
@@ -37,30 +37,12 @@
           <textarea formControlName="description" [disabled]="!isEditing"></textarea>
         </form>
 
-        <h3>Клініка</h3>
-        <div class="info-group">
-          <label>Назва</label>
-          <input [value]="animal.vetClinic?.name" disabled />
-          <label>Адреса</label>
-          <input [value]="animal.vetClinic?.address" disabled />
-          <label>Телефон</label>
-          <input [value]="animal.vetClinic?.phone" disabled />
-        </div>
-
-        <h3>Відповідальний лікар</h3>
+        <h3>Відповідальний волонтер</h3>
         <div class="info-group">
           <label>Ім’я</label>
           <input [value]="animal.responsibleUser?.name" disabled />
           <label>Телефон</label>
           <input [value]="animal.responsibleUser?.phone" disabled />
-        </div>
-
-        <h3>Відповідальний волонтер</h3>
-        <div class="info-group">
-          <label>Ім’я</label>
-          <input [value]="animal.responsibleVolunteer?.name" disabled />
-          <label>Телефон</label>
-          <input [value]="animal.responsibleVolunteer?.phone" disabled />
         </div>
 
         <div class="form-buttons" *ngIf="animalForm">
@@ -115,7 +97,7 @@
           Я — {{ a.breed ? a.breed : 'тваринка' }}. Мене знайшли {{ animal.foundDate }}, і зараз я {{ statusText }}.
         </p>
         <p>
-          Мені дуже потрібна твоя турбота — ти можеш стежити за моєю історією, підтримати або навіть прихистити мене 💚
+          Мені дуже потрібна твоя турбота — ти можеш стежити за моєю історією, підтримати або навіть прихистити мене!
         </p>
         <div class="qr-container" style="margin-top: 1rem;">
           <h3>QR-код профілю</h3>
@@ -141,6 +123,15 @@
       </div>
     </section>
   </ng-template>
+
+  <div class="modal-overlay" *ngIf="isModalVisible">
+    <div class="modal">
+      <p>{{ modalMessage }}</p>
+      <div class="modal-buttons">
+        <button (click)="closeModal()">OK</button>
+      </div>
+    </div>
+  </div>
 </main>
 
 <app-site-footer></app-site-footer>

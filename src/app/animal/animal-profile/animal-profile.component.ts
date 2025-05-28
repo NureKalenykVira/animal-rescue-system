@@ -21,6 +21,7 @@ interface Animal {
   qrCodeUrl?: string;
   subscribed?: boolean;
 
+
   media?: {
     count: number;
     result: {
@@ -69,13 +70,15 @@ interface Animal {
 })
 export class AnimalProfileComponent {
 
-  // 🔹 Для всіх
+  // Для всіх
   animal: Animal | null = null;
   animalId!: number;
   isAuthenticated = true;
   isEditing = false;
   isFollowing = false;
   role: 'user' | 'volunteer' | 'vet' = 'vet';
+  modalMessage: string | null = null;
+  isModalVisible = false;
 
   statusLabels: { [key: number]: string } = {
     0: 'невідомо',
@@ -122,6 +125,7 @@ export class AnimalProfileComponent {
     this.isAuthenticated = !!localStorage.getItem('access_token');
     this.fetchAnimal();
     this.loadTreatmentReports();
+    this.loadAnimalReportByAnimalId();
 
     this.treatmentForm = this.fb.group({
       description: ['', Validators.required],
@@ -268,11 +272,11 @@ export class AnimalProfileComponent {
       })
       .then(res => {
         if (!res.ok) throw new Error('Не вдалося оновити тварину');
-        alert('Фото оновлено');
+        this.showModal('Фото оновлено');
       })
       .catch(err => {
         console.error('Помилка:', err);
-        alert('Не вдалося завантажити фото');
+        this.showModal('Не вдалося завантажити фото');
       });
   }
 
@@ -314,7 +318,7 @@ export class AnimalProfileComponent {
         this.loadTreatmentReports();
       })
       .catch(err => {
-        alert('Помилка при додаванні лікування: ' + err.message);
+        this.showModal('Помилка при додаванні лікування: ' + err.message);
       });
   }
 
@@ -402,11 +406,54 @@ export class AnimalProfileComponent {
         this.animal = updatedAnimal;
         this.animalForm.disable();
         this.isEditing = false;
-        alert('Зміни збережено');
+        this.loadAnimalReportByAnimalId();
+        this.showModal('Зміни збережено');
       })
       .catch(err =>
-        alert('Помилка при збереженні: ' + err.message));
+        this.showModal('Помилка при збереженні: ' + err.message));
   }
+
+    loadAnimalReportByAnimalId(): void {
+      const token = localStorage.getItem('access_token') || '';
+
+      fetch(`https://kkp-api.ruslan.page/api/animal-reports/${this.animalId}`, {
+        headers: {
+          'x-token': token
+        }
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (!data?.id) {
+          console.warn('Репорт не знайдено');
+          return;
+        }
+
+        console.log('[DEBUG] Отримано animal-report:', data);
+
+        if (this.animal) {
+          this.animal.responsibleUser = {
+            name: `${data.assigned_to.first_name} ${data.assigned_to.last_name}`,
+            role: 'Ветеринар',
+            phone: data.assigned_to.viber_phone || data.assigned_to.whatsapp_phone || ''
+          };
+
+        if (data.reported_by) {
+          this.animal.responsibleVolunteer = {
+            name: `${data.reported_by.first_name} ${data.reported_by.last_name}`,
+            phone: data.reported_by.viber_phone || data.reported_by.whatsapp_phone || ''
+          };
+        } else {
+          this.animal.responsibleVolunteer = undefined;
+        }
+
+        this.animal.foundDate = new Date(data.created_at * 1000).toLocaleDateString('uk-UA');
+        this.animal.location = data.location?.name || 'невідомо';
+      }
+      })
+      .catch(err => {
+        console.error('Помилка при завантаженні репорту:', err);
+      });
+    }
 
   // Для звичайного користувача
   get statusText(): string {
@@ -435,6 +482,16 @@ export class AnimalProfileComponent {
 
         this.cdr.detectChanges();
       })
-      .catch(err => alert(err.message));
+      .catch(err => console.log(err.message));
+  }
+
+  showModal(message: string): void {
+    this.modalMessage = message;
+    this.isModalVisible = true;
+  }
+
+  closeModal(): void {
+    this.isModalVisible = false;
+    this.modalMessage = null;
   }
 }

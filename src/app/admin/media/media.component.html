@@ -1,0 +1,81 @@
+<section class="admin-section">
+  <h2>Медіафайли</h2>
+
+  <div class="filter-controls">
+    <div class="filter-fields">
+      <label>
+        Тип:
+        <select [(ngModel)]="filters.type" (change)="applyFilters()">
+          <option value="">Усі</option>
+          <option value="1">Фото</option>
+          <option value="2">Відео</option>
+        </select>
+      </label>
+      <label>
+        Статус:
+        <select [(ngModel)]="filters.status" (change)="applyFilters()">
+          <option value="">Усі</option>
+          <option value="1">Активне</option>
+          <option value="2">Неактивне</option>
+        </select>
+      </label>
+      <label>
+        ID автора:
+        <input [(ngModel)]="filters.uploadedById" (change)="applyFilters()" />
+      </label>
+      <label>
+        Сортувати за:
+        <select [(ngModel)]="filters.orderBy" (change)="applyFilters()">
+          <option value="id">ID</option>
+          <option value="uploaded_at">Дата</option>
+        </select>
+      </label>
+      <label>
+        Напрямок:
+        <select [(ngModel)]="filters.order" (change)="applyFilters()">
+          <option value="asc">↑</option>
+          <option value="desc">↓</option>
+        </select>
+      </label>
+    </div>
+    <button class="green-btn" (click)="resetFilters()">Скинути</button>
+  </div>
+
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Попередній перегляд</th>
+        <th>URL</th>
+        <th>Тип</th>
+        <th>Дата</th>
+        <th>Дії</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let m of media">
+        <td>{{ m.id }}</td>
+        <td>
+          <img *ngIf="m.type === 1" [src]="m.url" alt="preview" height="50"/>
+          <span *ngIf="m.type === 2">🎥</span>
+        </td>
+        <td><a [href]="m.url" target="_blank">{{ m.url }}</a></td>
+        <td>{{ m.type === 1 ? 'Фото' : 'Відео' }}</td>
+        <td>{{ m.uploaded_at }}</td>
+        <td class="actions-cell">
+          <button class="btn-delete" (click)="openDeleteModal(m)">🗑</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="modal-overlay" *ngIf="mediaToDelete">
+    <div class="modal">
+      <h3>Видалити медіа #{{ mediaToDelete.id }}?</h3>
+      <div class="modal-buttons">
+        <button (click)="confirmDelete()">Видалити</button>
+        <button (click)="cancelDelete()">Скасувати</button>
+      </div>
+    </div>
+  </div>
+</section>

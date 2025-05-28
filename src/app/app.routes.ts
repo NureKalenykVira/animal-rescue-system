@@ -33,6 +33,21 @@ export const routes: Routes = [
   { path: 'home', component: HomeComponent },
   { path: 'animal/:id', component: AnimalProfileComponent },
   { path: 'auth/google/callback', loadComponent: () => import('./auth/google-callback.component').then(m => m.GoogleCallbackComponent) },
+  { path: 'admin',  loadComponent: () => import('./admin/admin-dashboard/admin-dashboard.component').then(m => m.AdminDashboardComponent) },
+  {
+    path: 'admin',
+    loadComponent: () => import('./admin/admin-dashboard/admin-dashboard.component').then(m => m.AdminDashboardComponent),
+    children: [
+      { path: 'users', loadComponent: () => import('./admin/users/users.component').then(m => m.UsersComponent) },
+      { path: 'animals', loadComponent: () => import('./admin/animals/animals.component').then(m => m.AnimalsComponent) },
+      { path: 'clinics', loadComponent: () => import('./admin/clinics/clinics.component').then(m => m.ClinicsComponent) },
+      { path: 'reports', loadComponent: () => import('./admin/reports/reports.component').then(m => m.ReportsComponent) },
+      { path: 'treatments', loadComponent: () => import('./admin/treatments/treatments.component').then(m => m.TreatmentsComponent) },
+      { path: 'media', loadComponent: () => import('./admin/media/media.component').then(m => m.MediaComponent) },
+      { path: 'donations', loadComponent: () => import('./admin/donations/donations.component').then(m => m.DonationsComponent) },
+      { path: 'volunteer-request', loadComponent: () => import('./admin/volunteer-request/volunteer-request.component').then(m => m.VolunteerRequestComponent) },
+    ]
+  },
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   { path: '**', redirectTo: 'home' }
 ];

@@ -275,3 +275,34 @@
     }
   }
 }
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+.modal-buttons {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: center;
+}
+
+.modal-buttons button {
+  padding: 0.5rem 1rem;
+  font-weight: bold;
+}

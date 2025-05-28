@@ -15,6 +15,8 @@ import { FormsModule } from '@angular/forms';
 export class LoginComponent {
   loginForm: FormGroup;
   loginError: string | null = null;
+  modalMessage: string | null = null;
+  isModalVisible = false;
 
   constructor(
     private fb: FormBuilder,
@@ -39,15 +41,21 @@ export class LoginComponent {
             next: (user) => {
               const roleCode = user.role;
               const role = this.getRoleFromCode(roleCode);
-              const isAdmin = [100, 999, 777].includes(roleCode);
-
               localStorage.setItem('role', role);
-              localStorage.setItem('isAdmin', String(isAdmin));
 
-              this.router.navigate([isAdmin ? '/admin' : '/animal']);
+              if (roleCode === 100) {
+                localStorage.setItem('user_id', String(user.id));
+              }
+              if (roleCode === 999) {
+                this.router.navigate(['/admin/users']);
+              } else if (roleCode === 100) {
+                this.router.navigate(['/admin/clinics']);
+              } else {
+                this.router.navigate(['/home']);
+              }
             },
             error: () => {
-              alert('Не вдалося отримати дані користувача після входу');
+              this.showModal('Не вдалося отримати дані користувача після входу');
             }
           });
         },
@@ -90,7 +98,7 @@ export class LoginComponent {
   requestReset(): void {
     this.authService.requestPasswordReset({ email: this.resetEmail }).subscribe({
       next: () => {
-        alert('Лист надіслано. Перевірте пошту або введіть токен вручну.');
+        this.showModal('Лист надіслано. Перевірте пошту або введіть токен вручну.');
         this.showForgotModal = false;
         this.showResetModal = true;
       },
@@ -109,18 +117,26 @@ export class LoginComponent {
       new_password: this.newPassword
     }).subscribe({
       next: () => {
-        alert('Пароль оновлено');
+        this.showModal('Пароль оновлено');
         this.showResetModal = false;
       },
       error: () => this.resetError = 'Невірний токен або помилка'
     });
   }
 
-  getRoleFromCode(roleCode: number): 'user' | 'volunteer' | 'vet' {
-    if (roleCode === 0) return 'user';
-    if (roleCode === 10) return 'volunteer';
-    if (roleCode === 11) return 'vet';
-    return 'user';
+  getRoleFromCode(roleCode: number): string {
+    switch (roleCode) {
+      case 999:
+        return 'GlobalAdmin';
+      case 100:
+        return 'LocalAdmin';
+      case 10:
+        return 'Vet';
+      case 11:
+        return 'Volunteer';
+      default:
+        return 'User';
+    }
   }
 
   loginWithGoogle(): void {
@@ -128,7 +144,17 @@ export class LoginComponent {
       next: (res) => {
         window.location.href = res.url; // Редирект
       },
-      error: () => alert('Не вдалося отримати Google URL')
+      error: () => this.showModal('Не вдалося отримати Google URL')
     });
+  }
+
+  showModal(message: string): void {
+    this.modalMessage = message;
+    this.isModalVisible = true;
+  }
+
+  closeModal(): void {
+    this.isModalVisible = false;
+    this.modalMessage = null;
   }
 }

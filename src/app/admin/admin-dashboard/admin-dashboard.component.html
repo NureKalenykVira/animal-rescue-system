@@ -1,1 +1,23 @@
-<p>admin-dashboard works!</p>
+<nav class="admin-nav">
+  <div class="nav-left" *ngIf="!isLocalAdmin">
+    <a routerLink="/admin/users" routerLinkActive="active">Користувачі</a>
+    <a routerLink="/admin/animals" routerLinkActive="active">Тварини</a>
+    <a routerLink="/admin/clinics" routerLinkActive="active">Клініки</a>
+    <a routerLink="/admin/reports" routerLinkActive="active">Звіти</a>
+    <a routerLink="/admin/treatments" routerLinkActive="active">Лікування</a>
+    <a routerLink="/admin/media" routerLinkActive="active">Медіа</a>
+    <a routerLink="/admin/donations" routerLinkActive="active">Донати</a>
+    <a routerLink="/admin/volunteer-request" routerLinkActive="active">Запити волонтерів</a>
+  </div>
+
+  <div class="nav-left" *ngIf="isLocalAdmin">
+    <a routerLink="/admin/clinics" routerLinkActive="active">Моя клініка</a>
+  </div>
+
+  <div class="nav-right" *ngIf="user">
+    <span class="user-name">{{ user.first_name }} {{ user.last_name }}</span>
+    <button class="logout-btn" (click)="logout()">Вийти</button>
+  </div>
+</nav>
+
+<router-outlet></router-outlet>

@@ -10,13 +10,13 @@
     <!-- Платіжна форма -->
     <form [formGroup]="donationForm" (ngSubmit)="submitDonation()" class="payment-form">
       <h1> Дякуємо за турботу! </h1>
-      <h4>{{ donation.name }}</h4>
-      <p>{{ donation.description }}</p>
+      <h4>{{ goal.name }}</h4>
+      <p>{{ goal.description }}</p>
 
-      <h3>Сума донату (грн)</h3>
+      <h3>Сума донату ($)</h3>
       <input type="number" formControlName="amount" placeholder="Введіть суму" />
       <div class="error" *ngIf="donationForm.get('amount')?.invalid && donationForm.get('amount')?.touched">
-        Вкажіть коректну суму (мін. 1 грн)
+        Вкажіть коректну суму (мін. $1)
       </div>
 
       <h3>Оплатити через</h3>
@@ -77,10 +77,20 @@
   <div class="modal-overlay" *ngIf="showDialog">
     <div class="modal-content">
       <h2>Дякуємо за донат!</h2>
-      <p>Ми щиро вдячні за вашу підтримку 🧡</p>
+      <p>Ми щиро вдячні за вашу підтримку!</p>
       <div class="modal-buttons">
         <button (click)="closeDialog()">Повернутись</button>
       </div>
     </div>
   </div>
+
+  <div class="modal-overlay2" *ngIf="isModalVisible">
+  <div class="modal2">
+    <p>{{ modalMessage }}</p>
+    <div class="modal-buttons2">
+      <button (click)="closeModal()">OK</button>
+    </div>
+  </div>
+</div>
+
 </main>
