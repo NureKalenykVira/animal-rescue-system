@@ -4,6 +4,7 @@ import { NgIf } from '@angular/common';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -17,15 +18,20 @@ export class LoginComponent {
   loginError: string | null = null;
   modalMessage: string | null = null;
   isModalVisible = false;
+  returnTo: string | null = null;
 
   constructor(
     private fb: FormBuilder,
     private router: Router,
+    private route: ActivatedRoute,
     private authService: AuthService
   ) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]]
+    });
+    this.route.queryParams.subscribe(params => {
+      this.returnTo = params['returnTo'] || '/home';
     });
   }
 
@@ -51,7 +57,7 @@ export class LoginComponent {
               } else if (roleCode === 100) {
                 this.router.navigate(['/admin/clinics']);
               } else {
-                this.router.navigate(['/home']);
+                this.router.navigate([this.returnTo || '/home']);
               }
             },
             error: () => {
@@ -79,7 +85,9 @@ export class LoginComponent {
   }
 
   goToRegister() {
-    this.router.navigate(['/auth/register']);
+    this.router.navigate(['/auth/register'], {
+      queryParams: { returnTo: this.returnTo || '/home' }
+    });
   }
 
   goBack(): void {

@@ -17,6 +17,7 @@ export type Donation = Goal;
 @Injectable({ providedIn: 'root' })
 export class DonationService {
   private apiUrl = 'https://kkp-api.ruslan.page/api/donations';
+  private lastCreatedDonationId: number = 0;
 
   constructor(private http: HttpClient) {}
 
@@ -28,5 +29,29 @@ export class DonationService {
 
   getDonationById(id: number): Observable<Goal> {
     return this.http.get<Goal>(`${this.apiUrl}/${id}`);
+  }
+
+  createPaypalOrder(goalId: number, formData: any, token: string): Promise<string> {
+   return fetch(`https://kkp-api.ruslan.page/api/donations/${goalId}/donate`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-token': token
+      },
+      body: JSON.stringify(formData)
+    })
+      .then(res => res.json())
+      .then(data => {
+        this.lastCreatedDonationId = data.id;
+        return data.paypal_id;
+      });
+  }
+
+  confirmPaypalDonation(goalId: number, donationId: number, payload: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/${goalId}/donations/${donationId}`, payload);
+  }
+
+  getLastDonationId(): number {
+    return this.lastCreatedDonationId;
   }
 }

@@ -11,9 +11,15 @@
         <form [formGroup]="animalForm" class="info-group">
           <label>Ім’я</label>
           <input type="text" formControlName="name" [disabled]="!isEditing" />
+          <span class="error" *ngIf="animalForm.get('name')?.invalid && animalForm.get('name')?.touched">
+            Ім’я обов’язкове
+          </span>
 
           <label>Порода</label>
           <input type="text" formControlName="breed" [disabled]="!isEditing" />
+          <span class="error" *ngIf="animalForm.get('breed')?.invalid && animalForm.get('breed')?.touched">
+            Порода обов’язкова
+          </span>
 
           <label>Стать</label>
           <select formControlName="gender" [disabled]="!isEditing">

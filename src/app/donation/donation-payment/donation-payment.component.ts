@@ -89,41 +89,35 @@ export class DonationPaymentComponent implements OnInit, AfterViewInit {
           disallow: [paypal.FUNDING.CARD]
         },
         createOrder: () => {
-          return fetch(`https://kkp-api.ruslan.page/api/donations/${this.goalId}/donate`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'x-token': localStorage.getItem('access_token') || ''
-            },
-            body: JSON.stringify(this.donationForm.value)
-          })
-            .then(res => res.json())
-            .then(data => {
-              this.createdDonationId = data.id;
-              return data.paypal_id;
+          const token = localStorage.getItem('access_token') || '';
+          return this.donationService
+            .createPaypalOrder(this.goalId, this.donationForm.value, token)
+            .then(paypalId => {
+              this.createdDonationId = this.donationService.getLastDonationId(); // або повертаємо з сервісу
+              return paypalId;
             });
         },
         onApprove: (data: any, actions: any) => {
           return actions.order.capture().then((details: any) => {
-            this.http.post(
-              `https://kkp-api.ruslan.page/api/donations/${this.goalId}/donations/${this.createdDonationId}`,
-              {
-                paypalOrderId: data.orderID,
-                email: details.payer.email_address,
-                name: details.payer.name?.given_name
-              }
-            ).subscribe({
-              next: () => {
-                this.showDialog = true;
-              },
-              error: (err) => {
-                console.error('Обробка платежу не вдалася:', err);
-              }
+            const payload = {
+              paypalOrderId: data.orderID,
+              email: details.payer.email_address,
+              name: details.payer.name?.given_name
+            };
+
+            this.donationService
+              .confirmPaypalDonation(this.goalId, this.createdDonationId, payload)
+              .subscribe({
+                next: () => {
+                  this.showDialog = true;
+                },
+                error: () => {
+                  this.showModal('Обробка платежу не вдалася');
+                }
             });
           });
         },
-        onError: (err: any) => {
-          console.error('Помилка PayPal:', err);
+        onError: () => {
           this.showModal('Помилка при оплаті через PayPal');
         }
       }).render('#paypal-button-container');

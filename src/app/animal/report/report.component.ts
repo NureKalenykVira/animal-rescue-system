@@ -19,6 +19,20 @@ interface ReportPayload {
   email?: string;
 }
 
+function fetchWithOptionalToken(url: string, options: RequestInit = {}): Promise<Response> {
+  const token = localStorage.getItem('access_token');
+  const headers = new Headers(options.headers || {});
+
+  if (token) {
+    headers.append('x-token', token);
+  }
+
+  return fetch(url, {
+    ...options,
+    headers
+  });
+}
+
 @Component({
   selector: 'app-report',
   standalone: true,
@@ -65,6 +79,16 @@ export class ReportComponent implements AfterViewInit, OnInit {
   ngOnInit(): void {
     const token = localStorage.getItem('access_token');
     this.isAuthenticated = !!token;
+    const saved = sessionStorage.getItem('reportFormState');
+
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        this.reportForm.patchValue(parsed.form);
+      } catch (e) {
+        console.warn('Не вдалося розпарсити збережену форму:', e);
+      }
+    }
 
     if (!this.isAuthenticated) {
       this.reportForm.get('email')?.setValidators([Validators.required, Validators.email]);
@@ -105,71 +129,93 @@ export class ReportComponent implements AfterViewInit, OnInit {
       size: file.size
     };
 
-    this.httpNoAuth.post<any>(`${this.apiUrl}/media`, mediaPayload).subscribe({
-      next: (res: any) => {
+    fetchWithOptionalToken(`${this.apiUrl}/media`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(mediaPayload)
+    })
+      .then(res => {
+        if (!res.ok) throw new Error('Не вдалося створити media');
+        return res.json();
+      })
+      .then((res: any) => {
         console.log('Media створено:', res);
         const mediaId = res.id;
         const uploadUrl = res.upload_url;
 
         console.log('Завантаження фото на:', uploadUrl);
-        fetch(uploadUrl, {
+        return fetchWithOptionalToken(uploadUrl, {
           method: 'PUT',
           body: file,
           headers: {
             'Content-Type': file.type
           }
-        })
-          .then(() => {
-            console.log('Фото завантажено, фіналізуємо...');
-            return this.httpNoAuth.post(`${this.apiUrl}/media/${mediaId}/finalize`, {}).toPromise();
-          })
-          .then(() => {
-            console.log('Фіналізація завершена. Відправка звіту...');
-            const genderRaw = this.reportForm.value.gender;
-            const genderMap: { [key: string]: number } = {
-              'Дівчинка': 2,
-              'Хлопчик': 1,
-              'Невідомо': 0
-            };
-            const gender = typeof genderRaw === 'string' ? genderMap[genderRaw] ?? 0 : genderRaw;
+        }).then(() => {
+          console.log('Фото завантажено, фіналізуємо...');
+          return fetchWithOptionalToken(`${this.apiUrl}/media/${mediaId}/finalize`, {
+            method: 'POST'
+          }).then(() => mediaId);
+        });
+      })
+      .then((mediaId: number) => {
+        console.log('Фіналізація завершена. Відправка звіту...');
 
-            const reportPayload: ReportPayload = {
-              name: this.reportForm.value.name,
-              breed: this.reportForm.value.type,
-              gender: gender,
-              notes: this.reportForm.value.notes,
-              latitude: this.selectedCoords!.lat,
-              longitude: this.selectedCoords!.lng,
-              media_ids: [mediaId]
-            };
+        const genderRaw = this.reportForm.value.gender;
+        const genderMap: { [key: string]: number } = {
+          'Дівчинка': 2,
+          'Хлопчик': 1,
+          'Невідомо': 0
+        };
+        const gender = typeof genderRaw === 'string' ? genderMap[genderRaw] ?? 0 : genderRaw;
 
-            if (!this.isAuthenticated) {
-              reportPayload.email = this.reportForm.value.email;
+        const reportPayload: ReportPayload = {
+          name: this.reportForm.value.name,
+          breed: this.reportForm.value.type,
+          gender: gender,
+          notes: this.reportForm.value.notes,
+          latitude: this.selectedCoords!.lat,
+          longitude: this.selectedCoords!.lng,
+          media_ids: [mediaId]
+        };
+
+        if (!this.isAuthenticated) {
+          reportPayload.email = this.reportForm.value.email;
+        }
+
+        return this.animalService.reportAnimal(reportPayload).toPromise();
+      })
+      .then((report: any) => {
+        console.log('Звіт надіслано');
+        sessionStorage.removeItem('reportFormState');
+        const animalId = report.animal?.id;
+        const animalName = report.animal?.name;
+        const imageUrl = report.media?.[0]?.url || report.animal?.media?.result?.[0]?.url || 'assets/img/animal-default.jpg';
+
+        if (animalId) {
+          fetch(`https://kkp-api.ruslan.page/api/subscriptions/${animalId}`, {
+            method: 'PUT',
+            headers: {
+              'x-token': localStorage.getItem('access_token') || ''
             }
-
-            this.animalService.reportAnimal(reportPayload).subscribe({
-              next: (report: any) => {
-                console.log('Звіт надіслано');
-                this.router.navigate(['/animal/volunteer-search'], {
-                  state: { reportId: report.id },
-                });
-              },
-              error: (err) => {
-                console.error('Помилка при надсиланні звіту:', err);
-                this.reportForm.setErrors({ submit: true });
-              }
-            });
-          })
-          .catch((err) => {
-            console.error('Помилка при завантаженні фото:', err);
-            this.reportForm.setErrors({ upload: true });
+          }).then(() => {
+            console.log(`Підписано на тварину ID ${animalId}`);
+          }).catch(err => {
+            console.warn('Не вдалося підписатися:', err);
           });
-      },
-      error: (err) => {
-        console.error('Помилка при створенні media:', err);
-        this.reportForm.setErrors({ media: true });
-      }
-    });
+
+          const newAnimal = { id: animalId, name: animalName, image: imageUrl };
+
+          this.router.navigate(['/animal/volunteer-search'], {
+            state: { reportId: report.id, newAnimal }
+          });
+        }
+        })
+      .catch((err) => {
+        console.error('Помилка в одному з етапів:', err);
+        this.reportForm.setErrors({ submit: true });
+      });
   } else {
     this.reportForm.markAllAsTouched();
     Object.keys(this.reportForm.controls).forEach((key) => {
@@ -181,6 +227,7 @@ export class ReportComponent implements AfterViewInit, OnInit {
     console.warn('Форма невалідна або відсутні координати / фото');
   }
 }
+
 
   onPhotoSelected(event: Event): void {
     const file = (event.target as HTMLInputElement)?.files?.[0];
@@ -247,11 +294,25 @@ export class ReportComponent implements AfterViewInit, OnInit {
     });
   }
 
+  saveFormState(): void {
+    const state = {
+      form: this.reportForm.value,
+      selectedCoords: this.selectedCoords,
+      selectedAddress: this.selectedAddress,
+      selectedFileName: this.selectedFileName,
+      photoURL: this.photoURL
+    };
+    sessionStorage.setItem('reportFormState', JSON.stringify(state));
+  }
+
+
   goToRegister(): void {
+    this.saveFormState();
     this.router.navigate(['/auth/register'], { queryParams: { returnTo: '/animal/report' } });
   }
 
   goToLogin(): void {
+    this.saveFormState();
     this.router.navigate(['/auth/login'], { queryParams: { returnTo: '/animal/report' } });
   }
 

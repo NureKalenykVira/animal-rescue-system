@@ -222,6 +222,13 @@
     }
   }
 
+  .error {
+    color: #e74c3c;
+    font-size: 0.875rem;
+    margin-top: 4px;
+    display: block;
+  }
+
   .admin-right {
     flex: 1 1 420px;
     display: flex;

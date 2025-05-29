@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { NgIf } from '@angular/common';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-register',
@@ -15,19 +16,24 @@ export class RegisterComponent {
   registerForm: FormGroup;
   modalMessage: string | null = null;
   isModalVisible = false;
+  returnTo: string | null = null;
 
   constructor(
     private fb: FormBuilder,
     private router: Router,
+    private route: ActivatedRoute,
     private authService: AuthService
-  ) {
-    this.registerForm = this.fb.group({
-      fullName: ['', Validators.required],
-      username: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]]
-    });
-  }
+    ) {
+      this.registerForm = this.fb.group({
+        fullName: ['', Validators.required],
+        username: ['', Validators.required],
+        email: ['', [Validators.required, Validators.email]],
+        password: ['', [Validators.required, Validators.minLength(6)]]
+      });
+      this.route.queryParams.subscribe(params => {
+        this.returnTo = params['returnTo'] || '/auth/login';
+      });
+    }
 
   onSubmit(): void {
   if (this.registerForm.valid) {
@@ -42,7 +48,9 @@ export class RegisterComponent {
     };
 
     this.authService.register(payload).subscribe({
-      next: () => this.router.navigate(['/auth/login']),
+      next: () => this.router.navigate(['/auth/login'], {
+        queryParams: { returnTo: this.returnTo || '/auth/login' }
+      }),
       error: (err: any) => this.showModal('Помилка реєстрації: ' + (err.error?.detail || 'Невірні дані'))
     });
   } else {

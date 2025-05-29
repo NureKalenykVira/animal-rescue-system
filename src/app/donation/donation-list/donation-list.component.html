@@ -11,7 +11,7 @@
     <h2>{{ donation.name }}</h2>
     <p>{{ donation.description }}</p>
     <div *ngIf="expandedDonationId === donation.id && donationDetailsCache[donation.id]">
-      <p><strong>Зібрано:</strong> {{ donationDetailsCache[donation.id].got_amount }} / {{ donationDetailsCache[donation.id].need_amount }} грн</p>
+      <p><strong>Зібрано:</strong> {{ donationDetailsCache[donation.id].got_amount }} / {{ donationDetailsCache[donation.id].need_amount }} $</p>
       <p><strong>Початок:</strong> {{ getFormattedDate(donationDetailsCache[donation.id].created_at) }}</p>
       <p *ngIf="donationDetailsCache[donation.id].ended_at">
         <strong>Завершення:</strong> {{ getFormattedDate(donationDetailsCache[donation.id].ended_at) }}

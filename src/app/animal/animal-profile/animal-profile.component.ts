@@ -123,9 +123,9 @@ export class AnimalProfileComponent {
   ngOnInit(): void {
     this.role = (localStorage.getItem('role') as 'user' | 'volunteer' | 'vet') || 'user';
     this.isAuthenticated = !!localStorage.getItem('access_token');
+    this.loadAnimalReportByAnimalId();
     this.fetchAnimal();
     this.loadTreatmentReports();
-    this.loadAnimalReportByAnimalId();
 
     this.treatmentForm = this.fb.group({
       description: ['', Validators.required],
@@ -200,9 +200,7 @@ export class AnimalProfileComponent {
         this.animalForm.patchValue({
           name: data.name || '',
           breed: data.breed || '',
-          gender: genderReverseMap[data.gender] ?? 'Невідомо',
           status: data.status ?? 0,
-          description: data.description || '',
           foundDate: new Date(data.updated_at).toLocaleDateString('uk-UA'),
           location: data.current_location?.name || 'невідомо',
         });
@@ -230,54 +228,61 @@ export class AnimalProfileComponent {
 
     // POST /media
     fetch('https://kkp-api.ruslan.page/api/media', {
-      method: 'POST',
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-token': token
+    },
+    body: JSON.stringify({
+      filename: file.name,
+      type: 1,
+      size: file.size
+    })
+  })
+  .then(res => res.json())
+  .then(media => {
+    if (!media.upload_url || !media.id) throw new Error('Неправильна відповідь від /media');
+    const uploadUrl = media.upload_url;
+    const mediaId = media.id;
+
+    // PUT на upload_url
+    return fetch(uploadUrl, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': file.type
+      },
+      body: file
+    }).then(() => {
+      // finalize upload
+      return fetch(`https://kkp-api.ruslan.page/api/media/${mediaId}/finalize`, {
+        method: 'POST',
+        headers: {
+          'x-token': token
+        }
+      }).then(() => mediaId); // повертаємо mediaId далі по ланцюжку
+    });
+  })
+  .then(mediaId => {
+    // PATCH /animals/{id}
+    return fetch(`https://kkp-api.ruslan.page/api/animals/${this.animalId}`, {
+      method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
         'x-token': token
       },
       body: JSON.stringify({
-        filename: file.name,
-        type: 1,
-        size: file.size
+        add_media_ids: [mediaId]
       })
-    })
-      .then(res => res.json())
-      .then(media => {
-        if (!media.upload_url || !media.id) throw new Error('Неправильна відповідь від /media');
-        const uploadUrl = media.upload_url;
-        const mediaId = media.id;
-
-        // PUT на upload_url
-        return fetch(uploadUrl, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': file.type
-          },
-          body: file
-        }).then(() => mediaId);
-      })
-      .then(mediaId => {
-
-        // PATCH /animals/{id}
-        return fetch(`https://kkp-api.ruslan.page/api/animals/${this.animalId}`, {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-token': token
-          },
-          body: JSON.stringify({
-            add_media_ids: [mediaId]
-          })
-        });
-      })
-      .then(res => {
-        if (!res.ok) throw new Error('Не вдалося оновити тварину');
-        this.showModal('Фото оновлено');
-      })
-      .catch(err => {
-        console.error('Помилка:', err);
-        this.showModal('Не вдалося завантажити фото');
-      });
+    });
+  })
+  .then(res => {
+    if (!res.ok) throw new Error('Не вдалося оновити тварину');
+    this.showModal('Фото оновлено');
+  })
+  .catch(err => {
+    console.error('Помилка:', err);
+    this.showModal('Не вдалося завантажити фото');
+  });
   }
 
   // Лікування
@@ -421,34 +426,49 @@ export class AnimalProfileComponent {
           'x-token': token
         }
       })
-      .then(res => res.json())
-      .then(data => {
-        if (!data?.id) {
-          console.warn('Репорт не знайдено');
-          return;
-        }
+        .then(res => res.json())
+        .then(data => {
+          if (!data?.id) {
+            console.warn('Репорт не знайдено');
+            return;
+          }
 
-        console.log('[DEBUG] Отримано animal-report:', data);
+          console.log('[DEBUG] Отримано animal-report:', data);
+
+          const genderReverseMap: { [key: number]: string } = {
+            0: 'Невідомо',
+            1: 'Хлопчик',
+            2: 'Дівчинка'
+          };
+
+          this.animalForm.patchValue({
+            gender: genderReverseMap[data.gender] ?? 'Невідомо',
+            description: data.notes || ''
+          });
 
         if (this.animal) {
-          this.animal.responsibleUser = {
-            name: `${data.assigned_to.first_name} ${data.assigned_to.last_name}`,
-            role: 'Ветеринар',
-            phone: data.assigned_to.viber_phone || data.assigned_to.whatsapp_phone || ''
-          };
+            if (data.assigned_to) {
+              this.animal.responsibleUser = {
+                name: `${data.assigned_to.first_name} ${data.assigned_to.last_name}`,
+                role: 'Ветеринар',
+                phone: data.assigned_to.viber_phone || data.assigned_to.whatsapp_phone || ''
+              };
+              } else {
+                this.animal.responsibleUser = undefined;
+              }
 
-        if (data.reported_by) {
-          this.animal.responsibleVolunteer = {
-            name: `${data.reported_by.first_name} ${data.reported_by.last_name}`,
-            phone: data.reported_by.viber_phone || data.reported_by.whatsapp_phone || ''
-          };
-        } else {
-          this.animal.responsibleVolunteer = undefined;
+          if (data.reported_by) {
+            this.animal.responsibleVolunteer = {
+              name: `${data.reported_by.first_name} ${data.reported_by.last_name}`,
+              phone: data.reported_by.viber_phone || data.reported_by.whatsapp_phone || ''
+            };
+          } else {
+            this.animal.responsibleVolunteer = undefined;
+          }
+
+          this.animal.foundDate = new Date(data.created_at * 1000).toLocaleDateString('uk-UA');
+          this.animal.location = data.location?.name || 'невідомо';
         }
-
-        this.animal.foundDate = new Date(data.created_at * 1000).toLocaleDateString('uk-UA');
-        this.animal.location = data.location?.name || 'невідомо';
-      }
       })
       .catch(err => {
         console.error('Помилка при завантаженні репорту:', err);
