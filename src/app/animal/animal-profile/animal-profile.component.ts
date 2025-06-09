@@ -175,7 +175,7 @@ export class AnimalProfileComponent {
       }
 
         setTimeout(() => {
-          const qrText = `https://5de7-45-152-72-146.ngrok-free.app/animal/${this.animalId}`;
+          const qrText = `https://animal-rescue-system.onrender.com/animal/${this.animalId}`;
           const qrElement = document.getElementById('qrCode');
 
           if (qrElement) {
