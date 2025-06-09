@@ -93,7 +93,7 @@ export class DonationPaymentComponent implements OnInit, AfterViewInit {
           return this.donationService
             .createPaypalOrder(this.goalId, this.donationForm.value, token)
             .then(paypalId => {
-              this.createdDonationId = this.donationService.getLastDonationId(); // або повертаємо з сервісу
+              this.createdDonationId = this.donationService.getLastDonationId();
               return paypalId;
             });
         },

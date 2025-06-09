@@ -15,6 +15,7 @@ import { DonationPaymentComponent } from './donation/donation-payment/donation-p
 import { HomeComponent } from './main/home/home.component';
 import { AboutComponent } from './main/about/about.component';
 import { GoogleCallbackComponent } from './auth/google-callback.component';
+import { ResetPasswordComponent } from './auth/reset-password/reset-password.component';
 
 export const routes: Routes = [
   { path: 'auth/login', component: LoginComponent },
@@ -32,6 +33,7 @@ export const routes: Routes = [
   { path: 'about', component: AboutComponent },
   { path: 'home', component: HomeComponent },
   { path: 'animal/:id', component: AnimalProfileComponent },
+  { path: 'auth/reset-password', component: ResetPasswordComponent },
   { path: 'auth/google/callback', loadComponent: () => import('./auth/google-callback.component').then(m => m.GoogleCallbackComponent) },
   { path: 'admin',  loadComponent: () => import('./admin/admin-dashboard/admin-dashboard.component').then(m => m.AdminDashboardComponent) },
   {

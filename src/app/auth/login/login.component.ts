@@ -150,7 +150,7 @@ export class LoginComponent {
   loginWithGoogle(): void {
     this.authService.getGoogleAuthUrl().subscribe({
       next: (res) => {
-        window.location.href = res.url; // Редирект
+        window.location.href = res.url;
       },
       error: () => this.showModal('Не вдалося отримати Google URL')
     });

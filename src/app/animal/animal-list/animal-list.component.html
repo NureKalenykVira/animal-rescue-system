@@ -40,43 +40,43 @@
   </section>
 
   <!-- Список тварин -->
-  <p *ngIf="animals.length === 0" class="empty-message">
+  <p *ngIf="visibleAnimals.length === 0" class="empty-message">
     Жодної тваринки не знайдено
   </p>
-  <section class="animal-grid">
-    <div class="animal-card" *ngFor="let animal of visibleAnimals">
-      <a [routerLink]="['/animal', animal.id]">
-        <img *ngIf="animal.isFollowing"
-          src="assets/img/paws.png"
-          alt="Стежите"
-          class="follow-marker-img" />
-        <img [src]="animal.photoUrl || 'assets/img/animal-default.jpg'" alt="Тварина" />
-        <div class="animal-info">
-          <h3>{{ animal.name || 'Тварина' }}</h3>
-          <button
-            [disabled]="!isAuthenticated"
-            class="green-btn"
-            [ngClass]="{
-              'not-authenticated': !isAuthenticated,
-              'is-following': isAuthenticated && animal.isFollowing
-            }"
-            (click)="toggleFollow(animal); $event.preventDefault(); $event.stopPropagation()"
-            >
-              {{
-                !isAuthenticated
-                  ? 'Стежити за твариною'
-                  : animal.isFollowing
-                    ? 'Перестати слідкувати'
-                    : 'Стежити'
-              }}
-            </button>
-        </div>
-      </a>
-    </div>
-    <div class="load-more-wrapper" *ngIf="visibleCount < animals.length">
-      <button class="green-btn" (click)="loadMore()">Завантажити ще</button>
-    </div>
-  </section>
+<section class="animal-grid">
+  <div class="animal-card" *ngFor="let animal of visibleAnimals">
+    <a [routerLink]="['/animal', animal.id]">
+      <img *ngIf="animal.isFollowing"
+        src="assets/img/paws.png"
+        alt="Стежите"
+        class="follow-marker-img" />
+      <img [src]="animal.photoUrl || 'assets/img/animal-default.jpg'" alt="Тварина" />
+      <div class="animal-info">
+        <h3>{{ animal.name || 'Тварина' }}</h3>
+        <button
+          [disabled]="!isAuthenticated"
+          class="green-btn"
+          [ngClass]="{
+            'not-authenticated': !isAuthenticated,
+            'is-following': isAuthenticated && animal.isFollowing
+          }"
+          (click)="toggleFollow(animal); $event.preventDefault(); $event.stopPropagation()"
+        >
+          {{
+            !isAuthenticated
+              ? 'Стежити за твариною'
+              : animal.isFollowing
+                ? 'Перестати слідкувати'
+                : 'Стежити'
+          }}
+        </button>
+      </div>
+    </a>
+  </div>
+</section>
+  <div class="load-more-wrapper" *ngIf="visibleAnimals.length < allAnimals.length">
+    <button class="green-btn" (click)="loadMore()">Завантажити ще</button>
+  </div>
 </main>
 
 <app-site-footer></app-site-footer>

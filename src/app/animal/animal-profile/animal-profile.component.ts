@@ -175,7 +175,7 @@ export class AnimalProfileComponent {
       }
 
         setTimeout(() => {
-          const qrText = `https://998f-45-152-72-1.ngrok-free.app/animal/${this.animalId}`;
+          const qrText = `https://513c-45-152-72-146.ngrok-free.app/animal/${this.animalId}`;
           const qrElement = document.getElementById('qrCode');
 
           if (qrElement) {
@@ -212,7 +212,6 @@ export class AnimalProfileComponent {
       });
   }
 
-  // Фото
   onPhotoSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (!input.files || !input.files[0]) return;

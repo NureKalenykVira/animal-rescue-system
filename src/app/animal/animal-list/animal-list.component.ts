@@ -15,14 +15,14 @@ import { AnimalService } from '../../services/animal.service';
   styleUrl: './animal-list.component.scss'
 })
 export class AnimalListComponent implements OnInit {
-  animals: any[] = [];
-  visibleAnimals: any[] = [];
+  allAnimals: any[] = [];        // Всі тварини з бекенду
+  visibleAnimals: any[] = [];    // Видимі зараз
+  loadStep = 20;                 // Кількість тварин на сторінку
   visibleCount = 0;
-  loadStep = 20;
-  page = 1;
+  totalCount = 0;
+
   selectedStatus: string = '';
   sortOrder: 'asc' | 'desc' = 'desc';
-
   isAuthenticated = false;
   token = '';
 
@@ -32,14 +32,11 @@ export class AnimalListComponent implements OnInit {
     const stored = localStorage.getItem('access_token');
     this.token = stored || '';
     this.isAuthenticated = !!this.token;
-
     this.fetchAnimals();
   }
 
   async fetchAnimals(): Promise<void> {
     let params = new HttpParams()
-      .set('page', this.page.toString())
-      .set('page_size', this.loadStep.toString())
       .set('order_by', 'updated_at')
       .set('order', this.sortOrder);
 
@@ -58,9 +55,8 @@ export class AnimalListComponent implements OnInit {
         .get<any>('https://kkp-api.ruslan.page/api/animals', { params, headers })
         .toPromise();
 
-        const animalPromises = res.result.map(async (animal: any) => {
+      const animalPromises = res.result.map(async (animal: any) => {
         const photoUrl = animal.media?.result?.[0]?.url || '';
-
         return {
           id: animal.id,
           name: animal.name,
@@ -71,24 +67,36 @@ export class AnimalListComponent implements OnInit {
       });
 
       const finalAnimals = await Promise.all(animalPromises);
-      this.animals.push(...finalAnimals);
-      this.loadMore();
-      this.page++;
+
+      this.allAnimals = finalAnimals;
+      this.totalCount = res.count || finalAnimals.length;
+
+      this.visibleAnimals = this.allAnimals.slice(0, this.loadStep);
+      this.visibleCount = this.visibleAnimals.length;
+
+      console.log(
+        '[fetchAnimals] allAnimals:', this.allAnimals.length,
+        'visibleAnimals:', this.visibleAnimals.length,
+        'loadMoreVisible:', this.visibleAnimals.length < this.allAnimals.length
+      );
     } catch (err) {
-      console.error('❌ Помилка завантаження тварин:', err);
+      console.error('Помилка завантаження тварин:', err);
     }
   }
 
-
   loadMore(): void {
-    const nextChunk = this.animals.slice(this.visibleCount, this.visibleCount + this.loadStep);
+    const nextChunk = this.allAnimals.slice(this.visibleCount, this.visibleCount + this.loadStep);
     this.visibleAnimals.push(...nextChunk);
-    this.visibleCount += this.loadStep;
+    this.visibleCount = this.visibleAnimals.length;
+    console.log(
+      '[fetchAnimals] allAnimals:', this.allAnimals.length,
+      'visibleAnimals:', this.visibleAnimals.length,
+      'loadMoreVisible:', this.visibleAnimals.length < this.allAnimals.length
+    );
   }
 
   toggleFollow(animal: any): void {
     if (!this.token) return;
-
     const obs = animal.isFollowing
       ? this.animalService.unfollowAnimal(animal.id, this.token)
       : this.animalService.followAnimal(animal.id, this.token);
@@ -124,10 +132,10 @@ export class AnimalListComponent implements OnInit {
   }
 
   resetAndFetch(): void {
-    this.page = 1;
-    this.animals = [];
+    this.allAnimals = [];
     this.visibleAnimals = [];
     this.visibleCount = 0;
+    this.totalCount = 0;
     this.fetchAnimals();
   }
 }
