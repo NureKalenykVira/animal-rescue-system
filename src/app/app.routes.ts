@@ -33,7 +33,7 @@ export const routes: Routes = [
   { path: 'about', component: AboutComponent },
   { path: 'home', component: HomeComponent },
   { path: 'animal/:id', component: AnimalProfileComponent },
-  { path: 'auth/reset-password', component: ResetPasswordComponent },
+  { path: 'reset-password', component: ResetPasswordComponent },
   { path: 'auth/google/callback', loadComponent: () => import('./auth/google-callback.component').then(m => m.GoogleCallbackComponent) },
   { path: 'admin',  loadComponent: () => import('./admin/admin-dashboard/admin-dashboard.component').then(m => m.AdminDashboardComponent) },
   {
