@@ -30,6 +30,9 @@ export class SiteHeaderComponent {
 
   logout(): void {
     localStorage.removeItem('access_token');
+    localStorage.removeItem('role');
+    localStorage.removeItem('user_id');
+    localStorage.removeItem('isAdmin');
     this.isAuthenticated = false;
     window.location.reload();
   }

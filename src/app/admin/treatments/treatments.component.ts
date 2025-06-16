@@ -13,6 +13,7 @@ import { FormsModule } from '@angular/forms';
 export class TreatmentsComponent implements OnInit {
   treatments: any[] = [];
   treatmentToDelete: any = null;
+  treatmentToPay: any = null;
   apiUrl = 'https://kkp-api.ruslan.page/api';
 
   filters = {
@@ -20,7 +21,16 @@ export class TreatmentsComponent implements OnInit {
     animalId: '',
     reportId: '',
     orderBy: 'id',
-    order: 'asc'
+    order: 'asc',
+    payoutStatus: ''
+  };
+  filterStatus: string = '';
+
+  payoutStatusLabels: { [key: number]: string } = {
+    0: 'не запитано',
+    1: 'запитано',
+    2: 'у обробці',
+    3: 'виплачено',
   };
 
   page = 1;
@@ -70,6 +80,9 @@ export class TreatmentsComponent implements OnInit {
     if (this.filters.reportId.trim() !== '') {
       params = params.set('report_id', this.filters.reportId);
     }
+    if (this.filters.payoutStatus) {
+      params = params.set('payout_status', this.filters.payoutStatus);
+    }
 
     this.http.get<any>(`${this.apiUrl}/admin/treatment-reports`, {
       headers: { 'x-token': token },
@@ -101,7 +114,8 @@ export class TreatmentsComponent implements OnInit {
       animalId: '',
       reportId: '',
       orderBy: 'id',
-      order: 'asc'
+      order: 'asc',
+      payoutStatus: ''
     };
     this.page = 1;
     this.fetchTreatments();
@@ -129,6 +143,33 @@ export class TreatmentsComponent implements OnInit {
       error: err => {
         console.error('Не вдалося видалити лікування:', err);
         this.treatmentToDelete = null;
+      }
+    });
+  }
+
+  openPayoutModal(treatment: any): void {
+    this.treatmentToPay = treatment;
+  }
+
+  cancelPayout(): void {
+    this.treatmentToPay = null;
+  }
+
+  confirmPayout(): void {
+    if (!this.treatmentToPay) return;
+
+    const token = localStorage.getItem('access_token') || '';
+    this.http.post(`${this.apiUrl}/admin/treatment-reports/${this.treatmentToPay.id}/payout`, {
+      headers: { 'x-token': token }
+    }).subscribe({
+      next: () => {
+        // TODO: replace treatment with new one without reloading whole page
+        location.reload();
+        //this.treatmentToPay = null;
+      },
+      error: err => {
+        console.error('Не вдалося створити виплату для лікування:', err);
+        this.treatmentToPay = null;
       }
     });
   }

@@ -2,7 +2,7 @@
 
 <main class="animal-profile-container">
   <!-- Для волонтера та ветеринара -->
-  <ng-container *ngIf="canEdit && animal && animalForm; else readOnlyBlock">
+  <ng-container *ngIf="canEdit && animal; else readOnlyBlock">
     <div class="admin-layout">
       <!-- Ліва колонка — дані про тварину -->
       <div class="admin-left">
@@ -78,13 +78,16 @@
           <label>Витрати (грн)</label>
           <input type="number" step="0.01" formControlName="moneySpent" [disabled]="!canEdit" />
 
+          <label>PayPal email (залиште пустим, якщо виплата не потрібна)</label>
+          <input type="email" formControlName="paypalEmail" [disabled]="!canEdit" />
+
           <button type="submit" class="green-add">Додати</button>
         </form>
 
         <h3>Історія тварини</h3>
         <ul class="treatment-history">
           <li *ngFor="let report of treatmentReports">
-            {{ report.created_at }} — {{ report.description }} ({{ report.money_spent }} грн)
+            {{ report.created_at }} — {{ report.description }} ({{ report.money_spent }} грн, {{ payoutStatusLabels[report.payout_status] }})
           </li>
         </ul>
       </div>
@@ -93,42 +96,47 @@
 
   <!-- Для звичайного користувача -->
   <ng-template #readOnlyBlock>
-    <section class="animal-section" *ngIf="animal as a">
-      <div class="animal-photo">
-        <img [src]="photoPreview || 'assets/img/animal-default.jpg'" alt="Фото тварини" />
+  <section class="animal-section">
+    <div class="animal-photo">
+      <img [src]="photoPreview || 'assets/img/animal-default.jpg'" alt="Фото тварини" />
+    </div>
+    <div class="animal-info">
+      <h1 *ngIf="animal">{{ animal.name }}</h1>
+      <p *ngIf="animal">
+        Я — {{ animal.breed ? animal.breed : 'тваринка' }}. Мене знайшли {{ animal.foundDate }}, і зараз я {{ statusText }}.
+      </p>
+      <p *ngIf="animal">
+        Мені дуже потрібна твоя турбота — ти можеш стежити за моєю історією, підтримати або навіть прихистити мене!
+      </p>
+      <div class="qr-container" *ngIf="animal" style="margin-top: 1rem;">
+        <h3>QR‑код профілю</h3>
+        <div id="qrCode"></div>
       </div>
-      <div class="animal-info">
-        <h1>Привіт! Мене звати {{ a.name }}</h1>
-        <p>
-          Я — {{ a.breed ? a.breed : 'тваринка' }}. Мене знайшли {{ animal.foundDate }}, і зараз я {{ statusText }}.
-        </p>
-        <p>
-          Мені дуже потрібна твоя турбота — ти можеш стежити за моєю історією, підтримати або навіть прихистити мене!
-        </p>
-        <div class="qr-container" style="margin-top: 1rem;">
-          <h3>QR-код профілю</h3>
-          <div id="qrCode"></div>
-        </div>
-        <button
-          [disabled]="!isAuthenticated"
-          [class.disabled]="isFollowing || !isAuthenticated"
-          class="green full-width"
-          (click)="toggleFollow()">
-          {{ isFollowing ? 'Перестати слідкувати за твариною' : 'Стежити за твариною' }}
-        </button>
-        <h3>Історія лікування</h3>
-        <ul class="treatment-history styled">
-          <li *ngFor="let report of treatmentReports">
-            <div class="treatment-entry">
-              <span class="treatment-date">{{ report.created_at }}</span>
-              <span class="treatment-desc">{{ report.description }}</span>
-              <span class="treatment-cost">{{ report.money_spent }} грн</span>
-            </div>
-          </li>
-        </ul>
-      </div>
-    </section>
-  </ng-template>
+      <button
+        [disabled]="!isAuthenticated"
+        [class.disabled]="isFollowing || !isAuthenticated"
+        class="green full-width"
+        (click)="toggleFollow()">
+        {{ isFollowing ? 'Перестати слідкувати' : 'Стежити за твариною' }}
+      </button>
+
+      <h3>Історія лікування</h3>
+      <ul class="treatment-history styled">
+        <li *ngFor="let report of treatmentReports">
+          <div class="treatment-entry">
+            <span class="treatment-date">{{ report.created_at }}</span>
+            <span class="treatment-desc">{{ report.description }}</span>
+            <span class="treatment-cost">
+              {{ report.money_spent }} грн, {{ payoutStatusLabels[report.payout_status] }}
+            </span>
+          </div>
+        </li>
+        <li *ngIf="!treatmentReports?.length">Увійдіть, щоб переглянути історію лікування.</li>
+      </ul>
+    </div>
+  </section>
+</ng-template>
+
 
   <div class="modal-overlay" *ngIf="isModalVisible">
     <div class="modal">

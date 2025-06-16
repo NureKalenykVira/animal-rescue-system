@@ -105,6 +105,10 @@
         }
       }
 
+      .qr-container {
+        width: 100%;
+      }
+
       .green.full-width {
         background-color: #006c59;
         color: #fff;
@@ -312,11 +316,10 @@
         &:hover {
           background-color: #006c59;
         }
-      }
-    }
+      }    }
 
     .treatment-history {
-      width: 100%;
+      width: 110%;
       max-width: 600px;
       padding: 0;
       list-style: none;
@@ -349,7 +352,7 @@
 
     .treatment-date {
       color: #888;
-      min-width: 110px;
+      min-width: 120px;
     }
 
     .treatment-desc {
@@ -360,6 +363,7 @@
     .treatment-cost {
       font-weight: bold;
       color: #006c59;
+      min-width: 170px;
     }
   }
 }

@@ -89,6 +89,13 @@ export class AnimalProfileComponent {
     5: 'усиновлений/a'
   };
 
+  payoutStatusLabels: { [key: number]: string } = {
+    0: 'не запитано',
+    1: 'запитано',
+    2: 'у обробці',
+    3: 'виплачено',
+  };
+
   treatmentReports: any[] = [];
 
   treatmentForm!: FormGroup;
@@ -121,15 +128,16 @@ export class AnimalProfileComponent {
   }
 
   ngOnInit(): void {
-    this.role = (localStorage.getItem('role') as 'user' | 'volunteer' | 'vet') || 'user';
-    this.isAuthenticated = !!localStorage.getItem('access_token');
+    this.animal = {} as Animal;
     this.loadAnimalReportByAnimalId();
     this.fetchAnimal();
     this.loadTreatmentReports();
-
+    this.role = (localStorage.getItem('role') as 'user' | 'volunteer' | 'vet') || 'user';
+    this.isAuthenticated = !!localStorage.getItem('access_token');
     this.treatmentForm = this.fb.group({
       description: ['', Validators.required],
-      moneySpent: [0, [Validators.required, Validators.min(0)]]
+      moneySpent: [0, [Validators.required, Validators.min(0)]],
+      paypalEmail: ['', Validators.email],
     });
   }
 
@@ -182,8 +190,8 @@ export class AnimalProfileComponent {
             qrElement.innerHTML = '';
             new QRCode(qrElement, {
               text: qrText,
-              width: 128,
-              height: 128,
+              width: 180,
+              height: 180,
               colorDark: "#000000",
               colorLight: "#ffffff",
               correctLevel: QRCode.CorrectLevel.H
@@ -291,10 +299,13 @@ export class AnimalProfileComponent {
       return;
     }
 
+    const paypalEmail = this.treatmentForm.value.paypalEmail.trim();
+
     const treatment = {
       animal_report_id: this.animalId,
       description: this.treatmentForm.value.description.trim(),
       money_spent: this.treatmentForm.value.moneySpent,
+      payout_email: paypalEmail ? paypalEmail : null,
     };
 
     const token = localStorage.getItem('access_token') || '';
@@ -318,7 +329,7 @@ export class AnimalProfileComponent {
           localStorage.setItem(`lastSeenUpdate:${animalId}`, updatedAt.toString());
           console.log(`[Notification] Збережено updated_at ${updatedAt} для тварини ${animalId}`);
         }
-        this.treatmentForm.reset({ description: '', moneySpent: 0 });
+        this.treatmentForm.reset({ description: '', moneySpent: 0, paypalEmail: '' });
         this.loadTreatmentReports();
       })
       .catch(err => {
@@ -328,11 +339,11 @@ export class AnimalProfileComponent {
 
   loadTreatmentReports(): void {
     const token = localStorage.getItem('access_token') || '';
+    const headers: any = {};
+    if (token) headers['x-token'] = token;
 
     fetch(`https://kkp-api.ruslan.page/api/animals/${this.animalId}/treatment-reports`, {
-      headers: {
-        'x-token': token
-      }
+      headers
     })
       .then(res => res.json())
       .then(data => {

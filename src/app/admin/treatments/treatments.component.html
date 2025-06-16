@@ -26,6 +26,15 @@
           <option value="desc">Спаданням</option>
         </select>
       </label>
+      <label>Статус виплати:
+        <select [(ngModel)]="filters.payoutStatus" (change)="applyFilters()">
+          <option value="">Усі</option>
+          <option value="0">Не запитано</option>
+          <option value="1">Запитано</option>
+          <option value="2">У обробці</option>
+          <option value="3">Виплачено</option>
+        </select>
+      </label>
     </div>
     <button class="green-btn" (click)="resetFilters()">Скинути фільтри</button>
   </div>
@@ -36,23 +45,26 @@
         <th>ID</th>
         <th>Тварина</th>
         <th>Опис</th>
-        <th>Клініка</th>
         <th>Витрати</th>
+        <th>Виплата</th>
         <th>Дата</th>
         <th>Дії</th>
       </tr>
     </thead>
     <tbody>
       <tr *ngFor="let t of treatments">
+        <ng-container *ngIf="!filters.payoutStatus || t.payout_status.toString() === filters.payoutStatus">
         <td>{{ t.id }}</td>
         <td>{{ t?.animal_report?.animal?.name || t?.animal_report?.animal?.id || '—' }}</td>
         <td>{{ t.description }}</td>
-        <td>{{ t.vet_clinic?.name || '—' }}</td>
         <td>{{ t.money_spent }} грн</td>
+        <td>{{ payoutStatusLabels[t.payout_status] }}</td>
         <td>{{ t.created_at }}</td>
         <td class="actions-cell">
+          <button class="btn-save" *ngIf="t.payout_status == 1" (click)="openPayoutModal(t)">$</button>
           <button class="btn-delete" (click)="openDeleteModal(t)">🗑</button>
         </td>
+        </ng-container>
       </tr>
     </tbody>
   </table>
@@ -63,6 +75,16 @@
       <div class="modal-buttons">
         <button (click)="confirmDelete()">Видалити</button>
         <button (click)="cancelDelete()">Скасувати</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" *ngIf="treatmentToPay">
+    <div class="modal">
+      <h3>Виплатити лікування #{{ treatmentToPay.id }}?</h3>
+      <div class="modal-buttons">
+        <button (click)="confirmPayout()" class="btn-save">Виплатити</button>
+        <button (click)="cancelPayout()">Скасувати</button>
       </div>
     </div>
   </div>
