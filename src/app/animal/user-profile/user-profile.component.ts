@@ -105,92 +105,105 @@ export class UserProfileComponent implements OnInit {
     }
 
     this.userService.getUserInfo().subscribe({
-      next: user => {
-        this.user = {
-          id: user.id,
-          first_name: user.first_name,
-          last_name: user.last_name,
-          email: user.email,
-          photo: user.photo,
-          telegram_username: user.telegram_username,
-          viber_phone: user.viber_phone,
-          whatsapp_phone: user.whatsapp_phone
-        };
+  next: user => {
+    this.user = {
+      id: user.id,
+      first_name: user.first_name,
+      last_name: user.last_name,
+      email: user.email,
+      photo: user.photo,
+      telegram_username: user.telegram_username,
+      viber_phone: user.viber_phone,
+      whatsapp_phone: user.whatsapp_phone
+    };
 
-        this.role = this.getRoleFromCode(user.role);
-        this.isAdmin = this.checkIfAdmin(user.role);
-        localStorage.setItem('role', this.role);
-        localStorage.setItem('isAdmin', String(this.isAdmin));
+    this.role = this.getRoleFromCode(user.role);
+    this.isAdmin = this.checkIfAdmin(user.role);
+    localStorage.setItem('role', this.role);
+    localStorage.setItem('isAdmin', String(this.isAdmin));
 
-        this.profileForm.patchValue({
-          first_name: user.first_name,
-          last_name: user.last_name,
-          email: user.email,
-          telegram_username: user.telegram_username,
-          viber_phone: user.viber_phone,
-          whatsapp_phone: user.whatsapp_phone,
-        });
+    this.profileForm.patchValue({
+      first_name: user.first_name,
+      last_name: user.last_name,
+      email: user.email,
+      telegram_username: user.telegram_username,
+      viber_phone: user.viber_phone,
+      whatsapp_phone: user.whatsapp_phone,
+    });
 
-      this.animalService.getUserSubscriptions().subscribe({
-        next: res => {
-          const fromApi = res.result.map((animal: any) => {
-            const lastSeen = Number(localStorage.getItem(`lastSeenUpdate:${animal.id}`)) || 0;
-            const hasUpdate = animal.updated_at > lastSeen;
+    const updates: any[] = [];
 
-            if (hasUpdate) {
-              this.messages.push({
-                type: 'update',
-                animalId: animal.id,
-                animal: {
-                  name: animal.name
-                },
-                created_at: animal.updated_at * 1000
-              });
-            }
+    this.animalService.getUserSubscriptions().subscribe({
+      next: res => {
+        const fromApi = res.result.map((animal: any) => {
+          const lastSeen = Number(localStorage.getItem(`lastSeenUpdate:${animal.id}`)) || 0;
+          const hasUpdate = animal.updated_at > lastSeen;
 
-            return {
-              id: animal.id,
-              name: animal.name,
-              image: animal.media?.result?.[0]?.url || 'assets/img/animal-default.jpg'
-            };
-          });
-
-          this.animals = newAnimal
-            ? [newAnimal, ...fromApi.filter((a: { id: number }) => a.id !== newAnimal.id)]
-            : fromApi;
-          },
-          error: err => {
-            console.error('Не вдалося отримати підписки користувача:', err);
-          }
-        });
-
-        const allowedRoles = [10, 11, 100, 999];
-        if (allowedRoles.includes(user.role)) {
-          if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(pos => {
-              const lat = pos.coords.latitude;
-              const lon = pos.coords.longitude;
-
-              this.animalService.getAnimalReports(lat, lon).subscribe({
-                next: res => {
-                  this.messages = res.result.map((report: any) => ({
-                    ...report,
-                    type: 'new'
-                  }));
-                },
-                error: err => {
-                  console.error('Не вдалося отримати повідомлення:', err);
-                }
-              });
+          if (hasUpdate) {
+            updates.push({
+              type: 'update',
+              animalId: animal.id,
+              animal: {
+                name: animal.name
+              },
+              created_at: animal.updated_at * 1000
             });
           }
-        }
+
+          return {
+            id: animal.id,
+            name: animal.name,
+            image: animal.media?.result?.[0]?.url || 'assets/img/animal-default.jpg'
+          };
+        });
+
+        this.animals = newAnimal
+          ? [newAnimal, ...fromApi.filter((a: { id: number }) => a.id !== newAnimal.id)]
+          : fromApi;
       },
       error: err => {
-        console.error('Не вдалося отримати інформацію про користувача:', err);
-        console.error('Деталі помилки:', err.error);
+        console.error('Не вдалося отримати підписки користувача:', err);
       }
     });
+
+    const allowedRoles = [10, 11, 100, 999];
+    if (allowedRoles.includes(user.role)) {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(pos => {
+          const lat = pos.coords.latitude;
+          const lon = pos.coords.longitude;
+
+          this.animalService.getAnimalReports(lat, lon).subscribe({
+            next: res => {
+              console.log('[🐾] Отримано репорти з координатами:', res);
+
+              if (Array.isArray(res.result)) {
+                const newMessages = res.result.map((report: any) => ({
+                  ...report,
+                  type: 'new',
+                  created_at: report.created_at ? report.created_at * 1000 : Date.now()
+                }));
+
+                this.messages = [...newMessages, ...updates].sort((a, b) => b.created_at - a.created_at);
+
+                console.log('[✅] Повідомлення оновлено. Всього:', this.messages.length);
+              } else {
+                console.warn('⚠️ res.result не є масивом:', res.result);
+              }
+            },
+            error: err => {
+              console.error('Не вдалося отримати повідомлення:', err);
+            }
+          });
+        });
+      }
+    }
+  },
+  error: err => {
+    console.error('Не вдалося отримати інформацію про користувача:', err);
+    console.error('Деталі помилки:', err.error);
+  }
+});
   }
 
   get first_name() { return this.profileForm.get('first_name')!; }

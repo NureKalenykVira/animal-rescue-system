@@ -15,7 +15,8 @@
         <p class="footer-topic">{{ topic.title }}</p>
         <ul>
           <li *ngFor="let page of topic.pages">
-            <a [routerLink]="page.link">{{ page.name }}</a>
+            <a *ngIf="!page.isDownload" [routerLink]="page.link">{{ page.name }}</a>
+            <a *ngIf="page.isDownload" [href]="page.link" download>{{ page.name }}</a>
           </li>
         </ul>
       </div>

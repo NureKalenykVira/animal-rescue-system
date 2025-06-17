@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
-import { NgFor } from '@angular/common';
+import { NgFor, NgIf  } from '@angular/common';
 import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-site-footer',
-  imports: [NgFor, RouterModule],
+  imports: [NgFor, NgIf, RouterModule],
   templateUrl: './site-footer.component.html',
   styleUrl: './site-footer.component.scss'
 })
@@ -30,7 +30,7 @@ export class SiteFooterComponent {
       pages: [
         { name: 'Повідомити', link: '/animal/report' },
         { name: 'Зробити донат', link: '/donation/donation-list' },
-        { name: 'Мобільний застосунок', link: '/about#mobile' }
+        { name: 'Мобільний застосунок', link: 'assets/apk/app.apk', isDownload: true }
       ]
     }
   ];
