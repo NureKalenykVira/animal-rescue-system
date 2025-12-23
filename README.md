@@ -1,59 +1,98 @@
-# Frontend
+# Animal Rescue System — Frontend
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.11.
+Frontend client application for the Animal Rescue System.
+This repository contains only the client-side implementation. The backend API is external and maintained separately.
 
-## Development server
+---
 
-To start a local development server, run:
+## Tech Stack
 
-```bash
-ng serve
-```
+![Angular](https://img.shields.io/badge/Angular-DD0031?style=for-the-badge&logo=angular&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
+![SCSS](https://img.shields.io/badge/SCSS-CC6699?style=for-the-badge&logo=sass&logoColor=white)
+![RxJS](https://img.shields.io/badge/RxJS-B7178C?style=for-the-badge&logo=reactivex&logoColor=white)
+![Angular Router](https://img.shields.io/badge/Angular%20Router-DD0031?style=for-the-badge&logo=angular&logoColor=white)
+![Google Maps API](https://img.shields.io/badge/Google%20Maps-4285F4?style=for-the-badge&logo=googlemaps&logoColor=white)
+![Git](https://img.shields.io/badge/Git-F05032?style=for-the-badge&logo=git&logoColor=white)
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+---
 
-## Code scaffolding
+## About the Frontend
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+This frontend application provides the user interface for reporting, tracking, and managing animal rescue cases.
 
-```bash
-ng generate component component-name
-```
+It is responsible for:
+- collecting animal rescue reports from users
+- displaying rescue case details and status
+- providing role-based UI for volunteers and veterinarians
+- integrating interactive maps for location selection
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+All business logic and data persistence are handled by an external backend API.
 
-```bash
-ng generate --help
-```
+---
 
-## Building
+## Functional Overview
 
-To build the project run:
+Public users:
+- reporting a found or injured animal
+- providing location and description details
+- tracking report status
 
-```bash
-ng build
-```
+Authorized users (volunteers / veterinarians):
+- viewing and processing rescue reports
+- updating animal condition and status
+- managing assigned cases
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+Administrators:
+- managing users and roles
+- moderating reports
+- overseeing system activity
 
-## Running unit tests
+---
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+## Application Architecture
 
-```bash
-ng test
-```
+The frontend is implemented as an Angular single-page application with:
+- modular component structure
+- service-based API communication
+- reactive forms and validation
+- centralized routing configuration
 
-## Running end-to-end tests
+API communication is handled via HTTP services and environment-based configuration.
 
-For end-to-end (e2e) testing, run:
+---
 
-```bash
-ng e2e
-```
+## Getting Started (Development)
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+Prerequisites:
+- Node.js and npm
+- Angular CLI
 
-## Additional Resources
+Install dependencies:
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+    npm install
+
+Run development server:
+
+    ng serve
+
+The application will be available at:
+http://localhost:4200
+
+---
+
+## Environment Configuration
+
+The frontend uses environment configuration to define the backend API base URL and external service keys.
+
+Typical configuration includes:
+- API base URL
+- Google Maps API key
+
+Values are loaded from Angular environment files.
+
+---
+
+## Project Status
+
+The frontend application is functionally implemented and integrated with an external backend API.
